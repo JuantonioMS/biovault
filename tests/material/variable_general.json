@@ -1,0 +1,158 @@
+{
+
+    "general" : {},
+
+    "variables" :
+    [
+
+        {
+            "description" :
+            {
+                "description" : "",
+                "type" : "integer",
+                "name" : "var_integer"
+            },
+
+            "info" :
+            {
+                "longName" : "Integer variable",
+                "groups" : ["group1"]
+            },
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "general",
+                "name" : "integer"
+            }
+        },
+
+        {
+            "description" :
+            {
+                "description" : "",
+                "type" : "float",
+                "name" : "var_float"
+            },
+
+            "info" :
+            {
+                "longName" : "Float variable",
+                "groups" : ["group1"]
+            },
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "general",
+                "name" : "float"
+            }
+        },
+
+        {
+            "description" :
+            {
+                "description" : "",
+                "type" : "binomial",
+                "name" : "var_binomial"
+            },
+
+            "info" :
+            {
+                "longName" : "binomial variable",
+                "groups" : ["group1"]
+            },
+
+            "controls" :
+            [
+                "value in ['male', 'female']"
+            ],
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "general",
+                "name" : "binomial"
+            }
+        },
+
+        {
+            "description" :
+            {
+                "description" : "",
+                "type" : "boolean",
+                "name" : "var_boolean"
+            },
+
+            "info" :
+            {
+                "longName" : "boolean variable",
+                "groups" : ["group1"]
+            },
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "general",
+                "name" : "boolean"
+            }
+        },
+
+        {
+            "description" :
+            {
+                "description" : "",
+                "type" : "nominal",
+                "name" : "var_nominal"
+            },
+
+            "info" :
+            {
+                "longName" : "nominal variable",
+                "groups" : ["group1"]
+            },
+
+            "controls" :
+            [
+                "value in ['spain', 'france', 'germany', 'england']"
+            ],
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "general",
+                "name" : "nominal"
+            }
+        },
+
+        {
+            "description" :
+            {
+                "description" : "",
+                "type" : "ordinal",
+                "name" : "var_ordinal"
+            },
+
+            "info" :
+            {
+                "longName" : "ordinal variable",
+                "format" : "'low' < 'normal' < 'high'",
+                "groups" : ["group1"]
+            },
+
+            "controls" :
+            [
+                "value in ['low', 'normal', 'high']"
+            ],
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "general",
+                "name" : "ordinal"
+            }
+        }
+
+    ]
+
+}

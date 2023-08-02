@@ -1,0 +1,125 @@
+{
+
+    "general" : {},
+
+    "variables" :
+    [
+
+        {
+            "description" :
+            {
+                "description" : "",
+                "type" : "object",
+                "name" : "var_object"
+            },
+
+            "info" :
+            {
+                "longName" : "Object variable",
+                "groups" : ["group3"]
+            },
+
+            "values" :
+            [
+
+                {
+                    "description" :
+                    {
+                        "description" : "",
+                        "type" : "nominal",
+                        "name" : "var_object_nominal"
+                    },
+
+                    "info" :
+                    {
+                        "longName" : "Object nominal variable"
+                    },
+
+
+                    "source" :
+                    {
+                        "file" : "database.xlsx",
+                        "sheet" : "object",
+                        "name" : "nominal"
+                    }
+                },
+
+                {
+                    "description" :
+                    {
+                        "description" : "",
+                        "type" : "date",
+                        "name" : "var_object_date"
+                    },
+
+                    "info" :
+                    {
+                        "longName" : "Object date variable"
+                    },
+
+
+                    "source" :
+                    {
+                        "file" : "database.xlsx",
+                        "sheet" : "object",
+                        "name" : "date",
+                        "format" : "%d/%m/%y"
+                    }
+                },
+
+                {
+                    "description" :
+                    {
+                        "description" : "",
+                        "type" : "ordinal",
+                        "name" : "var_object_ordinal"
+                    },
+
+                    "info" :
+                    {
+                        "longName" : "Object ordinal variable"
+                    },
+
+
+                    "source" :
+                    {
+                        "file" : "database.xlsx",
+                        "sheet" : "object",
+                        "name" : "ordinal"
+                    }
+                },
+
+                {
+                    "description" :
+                    {
+                        "description" : "",
+                        "type" : "float",
+                        "name" : "var_object_float"
+                    },
+
+                    "info" :
+                    {
+                        "longName" : "Object float variable"
+                    },
+
+
+                    "source" :
+                    {
+                        "file" : "database.xlsx",
+                        "sheet" : "object",
+                        "name" : "float"
+                    }
+                }
+
+            ],
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "object"
+            }
+        }
+
+    ]
+
+}

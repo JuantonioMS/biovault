@@ -1,0 +1,35 @@
+{
+
+    "general" : {},
+
+    "variables" :
+    [
+
+        {
+
+            "description" :
+            {
+                "description" : "",
+                "type" : "date",
+                "name" : "var_date",
+                "longName" : "Date variable"
+            },
+
+            "info" :
+            {
+                "groups" : ["group2"]
+            },
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "dates",
+                "name" : "date",
+                "format" : "%d/%b/%Y"
+            }
+
+        }
+
+    ]
+
+}

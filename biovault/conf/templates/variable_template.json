@@ -1,0 +1,46 @@
+{
+
+    "general" : {},
+
+    "variables" :
+    [
+
+        {
+            "description" :
+            {
+                "description" : "",
+                "type" : "",
+                "name" : ""
+            },
+
+            "info" :
+            {
+                "longName" : "",
+                "groups" : [],
+                "format" : ""
+            },
+
+            "rules" :
+            {
+                "content" : [],
+                "interval" : [],
+                "mandatory" : true
+            },
+
+            "controls" :
+            [
+                ""
+            ],
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "dates",
+                "name" : "date",
+                "format" : "%d/%b/%Y"
+            }
+        }
+
+    ]
+
+}
