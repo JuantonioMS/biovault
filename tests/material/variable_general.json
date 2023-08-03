@@ -151,6 +151,28 @@
                 "sheet" : "general",
                 "name" : "ordinal"
             }
+        },
+
+        {
+            "description" :
+            {
+                "description" : "",
+                "type" : "multilabel",
+                "name" : "var_multilabel"
+            },
+
+            "info" :
+            {
+                "longName" : "multilabel variable",
+                "groups" : ["group1"]
+            },
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "general",
+                "name" : "multilabel"
+            }
         }
 
     ]

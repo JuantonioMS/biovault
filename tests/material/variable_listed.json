@@ -1,0 +1,100 @@
+{
+
+    "general" : {},
+
+    "variables" :
+    [
+
+        {
+            "description" :
+            {
+                "description" : "",
+                "type" : "listed",
+                "name" : "var_listed"
+            },
+
+            "info" :
+            {
+                "longName" : "Listed variable",
+                "groups" : ["group4"]
+            },
+
+            "item" :
+            {
+                "description" :
+                {
+                    "description" : "",
+                    "type" : "object",
+                    "name" : "var_listed_object"
+                },
+
+                "info" :
+                {
+                    "longName" : "Listed object variable"
+                },
+
+                "properties" :
+                [
+
+                    {
+                        "description" :
+                        {
+                            "description" : "",
+                            "type" : "nominal",
+                            "name" : "var_listed_object_nominal"
+                        },
+
+                        "info" :
+                        {
+                            "longName" : "Listed object nominal variable"
+                        },
+
+                        "source" :
+                        {
+                            "file" : "database.xlsx",
+                            "sheet" : "listed",
+                            "name" : "nominal"
+                        }
+                    },
+
+                    {
+                        "description" :
+                        {
+                            "description" : "",
+                            "type" : "date",
+                            "name" : "var_listed_object_date"
+                        },
+
+                        "info" :
+                        {
+                            "longName" : "Listed object date variable"
+                        },
+
+                        "source" :
+                        {
+                            "file" : "database.xlsx",
+                            "sheet" : "listed",
+                            "name" : "date",
+                            "format" : "%m-%d-%Y"
+                        }
+                    }
+
+                ],
+
+                "source" :
+                {
+                    "file" : "database.xlsx",
+                    "sheet" : "listed"
+                }
+            },
+
+            "source" :
+            {
+                "file" : "database.xlsx",
+                "sheet" : "listed"
+            }
+        }
+
+    ]
+
+}

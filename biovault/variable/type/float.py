@@ -1,9 +1,9 @@
 from typing import Any
 
-from biovault.variable import Variable
+from biovault.variable.type import Number
 
 
-class Float(Variable):
+class Float(Number):
 
 
     def _transformValue(self, value: Any) -> float:

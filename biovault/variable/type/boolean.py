@@ -7,6 +7,12 @@ from biovault.conf.constants import BOOLEAN_TRUE_LIKE, BOOLEAN_FALSE_LIKE
 class Boolean(Binomial):
 
 
+    @property
+    def content(self):
+        return [True, False]
+
+
+
     def _transformValue(self, value: Any) -> bool:
 
         if value in BOOLEAN_TRUE_LIKE: return True

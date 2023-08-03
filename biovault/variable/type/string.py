@@ -7,4 +7,4 @@ class String(Variable):
 
 
     def _transformValue(self, value: Any) -> str:
-        return str(value)
+        return str(value).lstrip(" ").rstrip(" ")

@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Any
 
@@ -47,7 +48,7 @@ class Register:
         else:
 
             if isinstance(self._data[key], list):
-                self._data[key].append(value)
+                self._data[key] = self._data[key] + value
 
             else:
                 print(f"WARNING! {key} is already defined and is not a list")
@@ -64,3 +65,9 @@ class Register:
 
         else:
             return False
+
+
+
+    def saveData2Json(self):
+        with open(f"{self.id}.json", "w") as outfile:
+            json.dump(self._data, outfile, indent = 4)

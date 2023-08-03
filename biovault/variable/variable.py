@@ -21,6 +21,10 @@ class Variable:
     @property
     def name(self) -> str: return self.info["description"]["name"]
 
+
+    #      info---------------------------------------------------------------------------------------------------------
+
+
     @property
     def longName(self) -> str:
         try: return self.info["info"]["longName"]
@@ -32,21 +36,19 @@ class Variable:
         except KeyError: return set()
 
 
-    #      controls-----------------------------------------------------------------------------------------------------
+    #      rules & controls---------------------------------------------------------------------------------------------
+
+
+    @property
+    def mandatory(self) -> bool:
+
+        try: return self.info["rules"]["mandatory"]
+        except KeyError: return False
 
 
     @property
     def controls(self) -> list:
         try: return self.info["controls"]
-        except KeyError: return []
-
-
-    #      controls-----------------------------------------------------------------------------------------------------
-
-
-    @property
-    def values(self) -> list:
-        try: return [Variable(value).getSpecificVariable() for value in self.info["values"]]
         except KeyError: return []
 
 
@@ -71,6 +73,32 @@ class Variable:
     def sourceFormat(self) -> str:
         try: return self.info["source"]["format"]
         except KeyError: return ""
+
+
+    #  CHECKS___________________________________________________________________________________________________________
+
+
+    def checkValue(self, value: Any, **kwargs) -> list:
+        return not any([not value for value in self._checkRules(value) + self._checkControls(value, **kwargs)])
+
+
+
+    def _checkRules(self, value: Any) -> list:
+
+        if self.mandatory:
+            return [value is not None]
+
+        else: return [True]
+
+
+
+    def _checkControls(self, value: Any) -> list:
+
+        checks = []
+        for control in self.controls:
+            pass
+
+        return checks
 
 
     #  METHODS__________________________________________________________________________________________________________
@@ -130,14 +158,9 @@ class Variable:
 
     def getSpecificVariable(self):
 
-        from biovault.variable.type import Integer, Float, Binomial, Boolean, Nominal, Ordinal, Object, Date
+        from biovault.variable.type import Integer, Float, \
+                                           String, Nominal, Multilabel, Ordinal, Binomial, Boolean, \
+                                           Date, Object, Listed
 
-        if   self.type ==  "integer": return Integer(self.info)
-        elif self.type ==    "float": return Float(self.info)
-        elif self.type == "binomial": return Binomial(self.info)
-        elif self.type ==  "boolean": return Boolean(self.info)
-        elif self.type ==  "nominal": return Nominal(self.info)
-        elif self.type ==  "ordinal": return Ordinal(self.info)
-        elif self.type ==   "object": return Object(self.info)
-        elif self.type ==     "date": return Date(self.info)
-        else: return self
+        try: return locals()[self.type.capitalize()](self.info)
+        except NameError: return self
