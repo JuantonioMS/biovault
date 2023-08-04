@@ -1,37 +1,28 @@
+import portion as P
+from typing import Any
+
 from biovault.variable import Variable
 
 
 class Complex(Variable):
 
 
-    @property
-    def length(self):
+    def _checkRules(self, value: Any) -> list:
 
-        try:
+        checks = super()._checkRules(value)
 
-            lowerInterval, upperInterval = self.info["rules"]["interval"].split(":")
+        checks["haveCorrectLength"] = len(value) in self.length
 
-            lowerBracket, lowerValue = lowerInterval[0], int(lowerInterval[1:])
-            upperBracket, upperValue = upperInterval[-1], int(upperInterval[:-1])
+        return checks
 
-            if lowerBracket == "(":
-                if upperBracket == ")": return P.open(lowerValue, upperValue)
-                else: return P.openclosed(lowerValue, upperValue)
-
-            else:
-                if upperBracket == ")": return P.closedopen(lowerValue, upperValue)
-                else: return P.closed(lowerValue, upperValue)
-
-        except KeyError:
-            return P.open(-P.inf, P.inf)
 
 
     @property
-    def interval(self) -> P:
+    def length(self) -> P:
 
         try:
 
-            lowerInterval, upperInterval = self.info["rules"]["interval"].split(":")
+            lowerInterval, upperInterval = self.info["rules"]["length"].split(":")
 
             lowerBracket, lowerValue = lowerInterval[0], float(lowerInterval[1:])
             upperBracket, upperValue = upperInterval[-1], float(upperInterval[:-1])
@@ -45,9 +36,4 @@ class Complex(Variable):
                 else: return P.closed(lowerValue, upperValue)
 
         except KeyError:
-            return P.open(-P.inf, P.inf)
-
-    @property
-    def values(self) -> list:
-        try: return [Variable(value).getSpecificVariable() for value in self.info["values"]]
-        except KeyError: return []
+            return P.closed(1, P.inf)

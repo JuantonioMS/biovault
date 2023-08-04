@@ -16,8 +16,11 @@ class Nominal(String):
 
     def _checkRules(self, value: Any) -> list:
 
-        return [value in self.content if self.content else True] + \
-               super()._checkRules(value)
+        checks = super()._checkRules(value)
+
+        checks["isInContent"] = value in self.content if self.content else True
+
+        return checks
 
 
 

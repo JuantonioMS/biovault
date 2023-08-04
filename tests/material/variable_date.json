@@ -1,6 +1,26 @@
 {
 
-    "general" : {},
+    "general" :
+    {
+
+        "description" :
+        {
+            "type" : "date"
+        },
+
+        "info" :
+        {
+            "groups" : ["dates"]
+        },
+
+        "source" :
+        {
+            "file" : "database.xlsx",
+            "sheet" : "dates",
+            "format" : "%d/%b/%Y"
+        }
+
+    },
 
     "variables" :
     [
@@ -10,22 +30,18 @@
             "description" :
             {
                 "description" : "",
-                "type" : "date",
-                "name" : "var_date",
-                "longName" : "Date variable"
+                "name" : "var_date"
             },
 
             "info" :
             {
+                "longName" : "Date variable",
                 "groups" : ["group2"]
             },
 
             "source" :
             {
-                "file" : "database.xlsx",
-                "sheet" : "dates",
-                "name" : "date",
-                "format" : "%d/%b/%Y"
+                "name" : "date"
             }
 
         }

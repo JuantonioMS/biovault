@@ -9,9 +9,11 @@ class Number(Variable):
 
     def _checkRules(self, value: Any) -> list:
 
-        auxCheck = super()._checkRules(value)
+        checks = super()._checkRules(value)
 
-        return auxCheck + [value in self.interval]
+        checks["isInInterval"] = value in self.interval
+
+        return checks
 
 
     @property

@@ -1,6 +1,18 @@
 {
 
-    "general" : {},
+    "general" :
+    {
+        "info" :
+        {
+            "groups" : ["general"]
+        },
+
+        "source" :
+        {
+            "file" : "database.xlsx",
+            "sheet" : "general"
+        }
+    },
 
     "variables" :
     [
@@ -21,8 +33,6 @@
 
             "source" :
             {
-                "file" : "database.xlsx",
-                "sheet" : "general",
                 "name" : "integer"
             }
         },
@@ -43,8 +53,6 @@
 
             "source" :
             {
-                "file" : "database.xlsx",
-                "sheet" : "general",
                 "name" : "float"
             }
         },
@@ -70,8 +78,6 @@
 
             "source" :
             {
-                "file" : "database.xlsx",
-                "sheet" : "general",
                 "name" : "binomial"
             }
         },
@@ -92,8 +98,6 @@
 
             "source" :
             {
-                "file" : "database.xlsx",
-                "sheet" : "general",
                 "name" : "boolean"
             }
         },
@@ -119,8 +123,6 @@
 
             "source" :
             {
-                "file" : "database.xlsx",
-                "sheet" : "general",
                 "name" : "nominal"
             }
         },
@@ -147,8 +149,6 @@
 
             "source" :
             {
-                "file" : "database.xlsx",
-                "sheet" : "general",
                 "name" : "ordinal"
             }
         },
@@ -169,8 +169,6 @@
 
             "source" :
             {
-                "file" : "database.xlsx",
-                "sheet" : "general",
                 "name" : "multilabel"
             }
         }

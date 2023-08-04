@@ -16,6 +16,8 @@ class Binomial(Nominal):
 
     def _checkRules(self, value: Any) -> list:
 
-        return [value in self.content,
-                len(self.content) == 2] + \
-               super()._checkRules(value)
+        checks = super()._checkRules(value)
+
+        checks["onlyTwoItemsInContent"] = len(self.content) == 2
+
+        return checks

@@ -68,6 +68,23 @@ class Register:
 
 
 
+    def checkValues(self) -> bool:
+
+        checks = {}
+        for variable in self.variables:
+
+            if variable.name in self._data:
+                check = variable.checkValue(self._data[variable.name])
+
+            else:
+                check = variable.checkValue(None)
+
+            checks[variable.name] = check
+
+        return checks
+
+
+
     def saveData2Json(self):
         with open(f"{self.id}.json", "w") as outfile:
             json.dump(self._data, outfile, indent = 4)

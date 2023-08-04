@@ -78,23 +78,30 @@ class Variable:
     #  CHECKS___________________________________________________________________________________________________________
 
 
-    def checkValue(self, value: Any, **kwargs) -> list:
-        return not any([not value for value in self._checkRules(value) + self._checkControls(value, **kwargs)])
+    def checkValue(self, value: Any, **kwargs) -> dict:
+
+        return {"rules" : self._checkRules(value),
+                "controls" : self._checkControls(value, **kwargs)}
 
 
 
     def _checkRules(self, value: Any) -> list:
 
-        if self.mandatory:
-            return [value is not None]
+        checks = {}
 
-        else: return [True]
+        if self.mandatory:
+            checks["isNotMissing"] = value is not None
+
+        else:
+            checks["isNotMissing"] = True
+
+        return checks
 
 
 
     def _checkControls(self, value: Any) -> list:
 
-        checks = []
+        checks = {}
         for control in self.controls:
             pass
 
@@ -158,7 +165,7 @@ class Variable:
 
     def getSpecificVariable(self):
 
-        from biovault.variable.type import Integer, Float, \
+        from biovault.variable.type import Integer, Float, Percentage, \
                                            String, Nominal, Multilabel, Ordinal, Binomial, Boolean, \
                                            Date, Object, Listed
 
