@@ -109,6 +109,28 @@
                         "sheet" : "object",
                         "name" : "float"
                     }
+                },
+
+                {
+                    "description" :
+                    {
+                        "description" : "",
+                        "type" : "binomial",
+                        "name" : "var_object_binomial"
+                    },
+
+                    "info" :
+                    {
+                        "longName" : "Object binomial variable"
+                    },
+
+
+                    "source" :
+                    {
+                        "file" : "database.xlsx",
+                        "sheet" : "object",
+                        "name" : "binomial"
+                    }
                 }
 
             ],

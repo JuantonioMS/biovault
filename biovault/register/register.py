@@ -85,6 +85,63 @@ class Register:
 
 
 
-    def saveData2Json(self):
+    def _summarizeDict(self, dictionary) -> bool:
+
+        flag = True
+        for key, value in dictionary.items():
+
+            if isinstance(value, bool):
+                flag = flag and value
+
+            elif isinstance(value, dict):
+                flag = flag and self._summarizeDict(value)
+
+            elif isinstance(value, list):
+
+                auxFlag = True
+                for element in value:
+
+                    if isinstance(element, bool):
+                        auxFlag = auxFlag and element
+
+                    elif isinstance(element, dict):
+                        auxFlag = auxFlag and self._summarizeDict(element)
+
+                flag = flag and auxFlag
+
+        return flag
+
+
+
+    def variablesCorrect(self) -> dict:
+
+        aux = {}
+        for name, checks in self.checkValues().items():
+            aux[name] = self._summarizeDict(checks)
+
+        return aux
+
+
+
+    def allCorrect(self) -> bool:
+        return self._summarizeDict(self.variablesCorrect())
+
+
+
+    def save(self) -> None:
+
         with open(f"{self.id}.json", "w") as outfile:
             json.dump(self._data, outfile, indent = 4)
+
+
+
+    def saveSecure(self) -> None:
+
+        aux = {}
+        for name, status in self.variablesCorrect().items():
+            if status:
+                aux[name] = self._data[name]
+
+        with open(f"{self.id}.json", "w") as outfile:
+            json.dump(aux, outfile, indent = 4)
+

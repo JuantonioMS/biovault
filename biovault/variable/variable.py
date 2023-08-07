@@ -21,6 +21,12 @@ class Variable:
     @property
     def name(self) -> str: return self.info["description"]["name"]
 
+    @property
+    def formula(self) -> str:
+
+        try: return self.info["description"]["formula"]
+        except KeyError: return ""
+
 
     #      info---------------------------------------------------------------------------------------------------------
 
@@ -99,7 +105,7 @@ class Variable:
 
 
 
-    def _checkControls(self, value: Any) -> list:
+    def _checkControls(self, value: Any, **kwargs) -> list:
 
         checks = {}
         for control in self.controls:
@@ -117,6 +123,9 @@ class Variable:
                      registers: object) -> object:
 
         from biovault.register import Register
+
+        if self.formula:
+            return registers
 
         dataframe = pd.read_excel(databases[self.sourceFile],
                                   sheet_name = self.sourceSheet)
@@ -165,7 +174,7 @@ class Variable:
 
     def getSpecificVariable(self):
 
-        from biovault.variable.type import Integer, Float, Percentage, \
+        from biovault.variable.type import Number, Integer, Float, Percentage, \
                                            String, Nominal, Multilabel, Ordinal, Binomial, Boolean, \
                                            Date, Object, Listed
 

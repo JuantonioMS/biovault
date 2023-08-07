@@ -7,6 +7,30 @@ from biovault.variable.type import Complex
 class Object(Complex):
 
 
+    def _checkRules(self, value: Any) -> list:
+
+        checks = super()._checkRules(value)
+
+        checks["properties"] = {}
+
+        for variable in self.properties:
+            checks["properties"][variable.name] = variable._checkRules(value[variable.name])
+
+        return checks
+
+
+
+    def _checkControls(self, value: Any, **kwargs) -> list:
+
+        controls = super()._checkControls(value)
+
+        controls["properties"] = {}
+        for variable in self.properties:
+            controls["properties"][variable.name] = variable._checkControls(value[variable.name], **kwargs)
+
+        return controls
+
+
     @property
     def properties(self):
 

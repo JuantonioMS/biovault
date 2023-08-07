@@ -16,7 +16,6 @@ class Complex(Variable):
         return checks
 
 
-
     @property
     def length(self) -> P:
 
