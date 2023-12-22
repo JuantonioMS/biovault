@@ -1,0 +1,61 @@
+[
+    {
+		"name": "pet",
+		"type": "nominal",
+		"rules": {
+			"enum": [
+				"dog",
+				"cat",
+				"hamster"
+			],
+			"required": false,
+			"type": "string"
+		},
+		"info": {
+			"description": "Mascota presente en casa"
+		},
+		"controls": []
+	},
+	{
+		"name": "sex",
+		"type": "binomial",
+		"rules": {
+			"required": true,
+			"enum": [
+				"male",
+				"female"
+			],
+			"type": "string"
+		},
+		"info": {},
+		"controls": []
+	},
+	{
+		"name": "employed",
+		"type": "boolean",
+		"info": {
+			"description": "Estado empleado o no"
+		},
+		"rules": {
+			"required": false,
+			"type": "boolean",
+			"enum": [
+				true,
+				false
+			]
+		},
+		"controls": []
+	},
+	{
+		"name": "nif",
+		"type": "string",
+		"rules": {
+			"required": true,
+			"type": "string"
+		},
+		"info": {
+			"description": "N\u00famero de identificaci\u00f3n fiscal"
+		},
+		"controls": []
+	}
+]

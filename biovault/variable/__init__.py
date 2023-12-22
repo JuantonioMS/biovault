@@ -1,1 +1,0 @@
-from biovault.variable.variable import Variable

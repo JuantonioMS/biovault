@@ -1,0 +1,58 @@
+[
+    {
+		"name": "age",
+		"type": "integer",
+		"rules": {
+			"required": true,
+			"minimum": 0.0,
+			"maximum": 120.0,
+			"type": "integer"
+		},
+		"info": {
+			"description": "Edad en el momento de recogida de datos"
+		},
+		"controls": []
+	},
+	{
+		"name": "height",
+		"type": "float",
+		"rules": {
+			"minimum": 50.0,
+			"maximum": 230.0,
+			"required": false,
+			"type": "number"
+		},
+		"info": {
+			"description": "Altura en cm"
+		},
+		"controls": []
+	},
+	{
+		"name": "weight",
+		"type": "float",
+		"rules": {
+			"minimum": 20.0,
+			"maximum": 180.0,
+			"required": false,
+			"type": "number"
+		},
+		"info": {
+			"description": "Peso en kg"
+		},
+		"controls": []
+	},
+	{
+		"name": "body_fat",
+		"type": "percentage",
+		"rules": {
+			"required": true,
+			"type": "number",
+			"minimum": 0.0,
+			"maximum": 1.0
+		},
+		"info": {
+			"description": "Porcentaje de grasa corporal"
+		},
+		"controls": []
+	}
+]
