@@ -6,8 +6,18 @@ from biovault.configuration.variable  import Variable
 
 class Configuration:
 
+    """
+    Clase de configuración que alberga las normas de una base de datos.
+    """
 
     def __init__(self, *args) -> None:
+
+        """
+        Método de inicialización.
+
+        Args:
+            *args (Path): ficheros que componen la configuración, pueden ser .xlsx o .json
+        """
 
         variables = []
         for file in args:
@@ -22,7 +32,8 @@ class Configuration:
 
 
 
-    def _readExcel(self, file: Path) -> list:
+    def _readExcel(self,
+                   file: Path) -> list:
 
         df = pd.read_excel(file)
 
@@ -48,17 +59,21 @@ class Configuration:
 
 
 
-    def _readJson(self, file: Path) -> list:
+    def _readJson(self,
+                  file: Path) -> list:
 
         with open(file, "r") as jsonFile:
             variables = json.load(jsonFile)
 
         return [Variable(variable).fabrica() for variable in variables]
 
-    def jsonSchema(self):
+
+
+    def jsonSchema(self) -> dict:
+
         schema = {"type" : "object",
-                  "properties" : {},
-                  "required" : [],
+                  "properties" : {"ID" : {}},
+                  "required" : ["ID"],
                   "additionalProperties": False}
 
         for variable in self._variables:
@@ -70,7 +85,10 @@ class Configuration:
 
         return schema
 
-    def save(self, file: Path) -> None:
+
+
+    def save(self,
+             file: Path) -> None:
 
         with open(file, "w") as outfile:
             json.dump([variable.jsonDumpFormat for variable in self._variables],

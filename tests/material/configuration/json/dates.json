@@ -4,8 +4,8 @@
         "type": "date",
         "rules": {
             "required": true,
-            "minimum": "1995-01-01",
-            "maximum": "2023-12-31",
+            "dateMinimum": "1995-01-01",
+            "dateMaximum": "2023-12-31",
             "type": "string",
             "format": "date"
         },

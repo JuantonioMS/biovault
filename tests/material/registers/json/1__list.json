@@ -1,0 +1,9 @@
+{
+    "computers": [
+        {
+            "cpu": "amd",
+            "gpu": "nvidia",
+            "storage": 512
+        }
+    ]
+}

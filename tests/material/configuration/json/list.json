@@ -1,0 +1,48 @@
+[
+    {
+        "name": "computers",
+        "type": "list",
+        "rules": {
+            "items": {
+                "name": "computer",
+                "type": "object",
+                "rules": {
+                    "properties": [
+                        {
+                            "name": "cpu",
+                            "type": "binomial",
+                            "rules": {
+                                "enum": ["amd", "intel"],
+                                "required": true
+                            }
+                        },
+
+                        {
+                            "name": "gpu",
+                            "type": "nominal",
+                            "rules": {
+                                "enum": ["intel", "amd", "nvidia"]
+                            }
+                        },
+
+                        {
+                            "name": "storage",
+                            "type": "integer",
+                            "rules": {
+                                "minimum": 100,
+			                    "maximum": 4000,
+			                    "required": true
+                            }
+                        }
+                    ],
+                    "info": {
+                        "description": "Características del ordenador"
+                    }
+                }
+            }
+        },
+        "info": {
+            "description": "Listado de ordenadores"
+        }
+    }
+]

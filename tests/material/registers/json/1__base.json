@@ -1,0 +1,14 @@
+{
+    "ID": 1,
+    "pet": "dog",
+    "sex": "male",
+    "employed": true,
+    "nif": "12345678X",
+    "smoke": "all the time",
+    "math_score": 4,
+    "age": 49.0,
+    "height": 150.0,
+    "weight": 65.0,
+    "body_fat": 0.65,
+    "birth_day": "2023-05-12"
+}

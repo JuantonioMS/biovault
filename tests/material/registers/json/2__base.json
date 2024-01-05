@@ -1,0 +1,14 @@
+{
+    "ID": 2,
+    "pet": "cat",
+    "sex": "female",
+    "employed": true,
+    "nif": "1234234678X",
+    "smoke": "something",
+    "math_score": 8,
+    "age": 34.0,
+    "height": 169.0,
+    "weight": 45.0,
+    "body_fat": 0.23,
+    "birth_day": "2021-03-15"
+}

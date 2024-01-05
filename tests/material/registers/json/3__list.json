@@ -1,0 +1,20 @@
+{
+    "computers": [
+        {
+            "cpu": "amd",
+            "gpu": "nvidia",
+            "storage": 512
+        },
+
+        {
+            "cpu": "intel",
+            "gpu": "radeon",
+            "storage": 512
+        },
+
+        {
+            "cpu": "qualcom",
+            "gpu": "amd"
+        }
+    ]
+}

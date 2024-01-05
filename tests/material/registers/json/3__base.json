@@ -1,0 +1,13 @@
+{
+    "ID": 3,
+    "pet": "hamster",
+    "employed": false,
+    "nif": "1234578X",
+    "smoke": "nothing",
+    "math_score": 10,
+    "age": 10.0,
+    "height": 165.0,
+    "weight": 75.0,
+    "body_fat": 0.79,
+    "birth_day": "2050-12-31"
+}

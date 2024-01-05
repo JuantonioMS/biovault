@@ -1,0 +1,12 @@
+{
+    "ID": 4,
+    "pet": "fish",
+    "employed": "yes",
+    "nif": "1235678X",
+    "smoke": "nona",
+    "math_score": 12,
+    "height": 74.0,
+    "weight": 100.0,
+    "body_fat": 1.12,
+    "birth_day": "54-12"
+}

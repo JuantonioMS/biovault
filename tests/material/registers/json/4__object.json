@@ -1,0 +1,8 @@
+{
+    "ID": 4,
+    "car": {
+        "brand": "nissan",
+        "model": "micra",
+        "fuel": "gas"
+    }
+}

@@ -1,0 +1,63 @@
+[
+    {
+        "name": "car",
+        "type": "object",
+        "rules": {
+            "properties": [
+                {
+                    "name": "brand",
+                    "type": "nominal",
+                    "rules": {
+                        "enum": [
+                            "toyota",
+                            "ford",
+                            "nissan"
+                        ],
+                        "required": true
+                    },
+                    "info": {
+                        "description": "Marca de coche"
+                    }
+                },
+
+                {
+                    "name": "model",
+                    "type": "string",
+                    "info": {
+                        "description": "Modelo de coche"
+                    }
+                },
+
+                {
+                    "name": "fuel",
+                    "type": "binomial",
+                    "rules": {
+                        "enum": [
+                            "diesel",
+                            "gasoline"
+                        ]
+                    },
+                    "info": {
+                        "description": "Tipo de combustible"
+                    }
+                },
+
+                {
+                    "name": "year",
+                    "type": "date",
+                    "rules": {
+                        "required": true
+                    },
+                    "info": {
+                        "description": "Fecha de compra"
+                    }
+                }
+            ],
+            "required": true
+        },
+        "info": {
+            "description": "Coche en propiedad"
+        },
+        "controls": []
+    }
+]

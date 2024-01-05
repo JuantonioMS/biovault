@@ -5,7 +5,7 @@ import pandas as pd
 from biovault.configuration.variable.types.simple.numerical import Numerical
 
 class Date(Numerical):
-    pass
+
 
     def _completeVariableInfo(self, variable: dict) -> dict:
 
@@ -14,7 +14,7 @@ class Date(Numerical):
         variable["rules"]["type"] = "string"
         variable["rules"]["format"] = "date"
 
-        for edge in ["minimum", "maximum"]:
+        for edge in ["formatMinimum", "formatMaximum"]:
 
             if edge in variable["rules"]:
                 if isinstance(variable["rules"][edge], str):
@@ -29,7 +29,7 @@ class Date(Numerical):
     def jsonDumpFormat(self) -> dict:
         aux = deepcopy(super().jsonDumpFormat)
 
-        for edge in ["minimum", "maximum"]:
+        for edge in ["formatMinimum", "formatMaximum"]:
             if edge in aux["rules"]:
                 aux["rules"][edge] = aux["rules"][edge].strftime("%Y-%m-%d")
 

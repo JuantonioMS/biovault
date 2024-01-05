@@ -1,0 +1,9 @@
+{
+    "ID": 1,
+    "car": {
+        "brand": "toyota",
+        "model": "corolla",
+        "fuel": "gasoline",
+        "year": "2022-01-20"
+    }
+}
