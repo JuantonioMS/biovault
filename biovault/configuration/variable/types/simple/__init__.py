@@ -1,4 +1,1 @@
-from biovault.configuration.variable.types import Types
-
-class Simple(Types):
-    pass
+from biovault.configuration.variable.types.simple.simple import Simple
