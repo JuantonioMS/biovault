@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import pandas as pd
 from typing import Any, Iterator
 
 from biovault.configuration import Configuration
@@ -26,6 +27,7 @@ class Registers:
         self._registers = self._readFiles(*args)
 
 
+
     def _readFiles(self,
                    *args) -> dict[str : Register]:
 
@@ -35,6 +37,7 @@ class Registers:
                                               self._readFile(file))
 
         return registers
+
 
 
     def _readFile(self,
@@ -48,8 +51,73 @@ class Registers:
 
     def _readExcel(self,
                    file: Path) -> dict[str : dict[str : Any]]:
-        pass
 
+        registers = {}
+        with pd.ExcelFile(file) as file:
+
+            for sheetName in file.sheet_names:
+                print(sheetName)
+
+                dataframe = file.parse(sheetName)
+
+                for _, row in dataframe.iterrows():
+
+                    if sheetName in self._configuration.getVariablesNames(type = "list"):
+
+                        if len(row.index) > 2:
+
+                            register = Register({"ID" : row["ID"],
+                                                 sheetName : [{column : value \
+                                                               for column, value in zip(row.index, row.values) \
+                                                               if column != "ID" and \
+                                                                  not pd.isna(value) and \
+                                                                  not (isinstance(value, str) and \
+                                                                       value.lower() in ["nan", "none",
+                                                                                         "ns", "nc",
+                                                                                         "ns/nc", "nc/ns"])}]},
+                                                configuration = self._configuration)
+
+                        else:
+
+                            register = Register({"ID" : row["ID"],
+                                                 sheetName : [value \
+                                                              for column, value in zip(row.index, row.values) \
+                                                              if column != "ID" and \
+                                                              not pd.isna(value) and \
+                                                              not (isinstance(value, str) and \
+                                                                   value.lower() in ["nan", "none",
+                                                                                     "ns", "nc",
+                                                                                     "ns/nc", "nc/ns"])]},
+                                                configuration = self._configuration)
+
+                    elif sheetName in self._configuration.getVariablesNames(type = "object"):
+
+                        register = Register({"ID" : row["ID"],
+                                             sheetName : {column : value \
+                                                          for column, value in zip(row.index, row.values) \
+                                                          if column != "ID" and \
+                                                          not pd.isna(value) and \
+                                                          not (isinstance(value, str) and \
+                                                               value.lower() in ["nan", "none",
+                                                                                 "ns", "nc",
+                                                                                 "ns/nc", "nc/ns"])}},
+                                            configuration = self._configuration)
+
+                    else:
+
+                        register = Register({column : value for column, value in zip(row.index, row.values)
+                                                            if not pd.isna(value) and \
+                                                            not (isinstance(value, str) and \
+                                                                 value.lower() in ["nan", "none",
+                                                                                   "ns", "nc",
+                                                                                   "ns/nc", "nc/ns"])},
+                                            configuration = self._configuration)
+
+                    registers = self._updateRegisters(registers,
+                                                    {row["ID"] : register})
+
+
+        return registers
 
 
     def _readJson(self,
@@ -61,9 +129,6 @@ class Registers:
 
         register = Register(data, configuration = self._configuration)
         return {register.id : register}
-
-
-
 
 
 

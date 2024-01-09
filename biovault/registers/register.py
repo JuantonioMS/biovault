@@ -61,7 +61,7 @@ class Register:
 
                 else:
                     if name in self._data:
-                        self._data[name] = list(set(self._data[name] + value))
+                        self._data[name] += value
                     else:
                         self._data[name] = value
 

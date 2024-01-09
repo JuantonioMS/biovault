@@ -55,6 +55,7 @@ class Object(Complex):
 
                 newValue = {}
                 for name, value in value.items():
+                    print(name, value)
                     newValue[name] = [variable for variable in self._variable["rules"]["properties"] if variable.name == name][0].transformValueToPython(value)
 
                 return newValue

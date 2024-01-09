@@ -33,20 +33,28 @@ class Configuration:
             variables.update(self._readFile(file))
 
         return variables
+
+
+
     def _readFile(self,
                   file: Path) -> dict[str : Variable]:
 
         if file.suffix == ".json": return self._readJson(file)
         elif file.suffix == ".xlsx": return self._readExcel(file)
-        elif file.suffix == ".csv": return self._readCSV(file)
         elif file.suffix == ".tsv": return self._readTSV(file)
         else: raise TypeError(f"{file.suffix} extension not valid")
+
+
+
     def _readJson(self,
                   file: Path) -> dict[str : Variable]:
 
         with open(file, "r") as jsonFile: variables = json.load(jsonFile)
 
         return {variable.name : variable for variable in [Variable(variable).fabrica() for variable in variables]}
+
+
+
     def _readExcel(self,
                    file: Path) -> dict[str : Variable]:
 
@@ -56,12 +64,15 @@ class Configuration:
                 variables.update(self._readSpreadSheet(file.parse(sheetName)))
 
         return variables
-    def _readCSV(self,
-                 file: Path) -> dict[str : Variable]:
-        return self._readSpreadSheet(pd.read_csv(file, sep = ";"))
+
+
+
     def _readTSV(self,
                  file: Path) -> dict[str : Variable]:
         return self._readSpreadSheet(pd.read_csv(file, sep = "\t"))
+
+
+
     def _readSpreadSheet(self,
                          dataframe: pd.DataFrame) -> dict[str : Variable]:
 
