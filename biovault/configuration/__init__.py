@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 from pathlib import Path
+from typing import Any, Iterator
 
 from biovault.configuration.variable  import Variable
 
@@ -10,7 +11,8 @@ class Configuration:
     Clase de configuración que alberga las normas de una base de datos.
     """
 
-    def __init__(self, *args) -> None:
+    def __init__(self,
+                 *args) -> None:
 
         """
         Método de inicialización.
@@ -19,26 +21,52 @@ class Configuration:
             *args (Path): ficheros que componen la configuración, pueden ser .xlsx o .json
         """
 
-        variables = []
+        self._variables = self._readFiles(*args)
+
+
+
+    def _readFiles(self,
+                   *args) -> dict[str : Variable]:
+
+        variables = {}
         for file in args:
+            variables.update(self._readFile(file))
 
-            if file.suffix == ".json":
-                variables += self._readJson(file)
+        return variables
+    def _readFile(self,
+                  file: Path) -> dict[str : Variable]:
 
-            elif file.suffix == ".xlsx":
-                variables += self._readExcel(file)
+        if file.suffix == ".json": return self._readJson(file)
+        elif file.suffix == ".xlsx": return self._readExcel(file)
+        elif file.suffix == ".csv": return self._readCSV(file)
+        elif file.suffix == ".tsv": return self._readTSV(file)
+        else: raise TypeError(f"{file.suffix} extension not valid")
+    def _readJson(self,
+                  file: Path) -> dict[str : Variable]:
 
-        self._variables = variables
+        with open(file, "r") as jsonFile: variables = json.load(jsonFile)
 
-
-
+        return {variable.name : variable for variable in [Variable(variable).fabrica() for variable in variables]}
     def _readExcel(self,
-                   file: Path) -> list:
+                   file: Path) -> dict[str : Variable]:
 
-        df = pd.read_excel(file)
+        variables = {}
+        with pd.ExcelFile("tests/material/registers/xlsx/registers.xlsx") as file:
+            for sheetName in file.sheet_names:
+                variables.update(self._readSpreadSheet(file.parse(sheetName)))
 
-        variables = []
-        for _, row in df.iterrows():
+        return variables
+    def _readCSV(self,
+                 file: Path) -> dict[str : Variable]:
+        return self._readSpreadSheet(pd.read_csv(file, sep = ";"))
+    def _readTSV(self,
+                 file: Path) -> dict[str : Variable]:
+        return self._readSpreadSheet(pd.read_csv(file, sep = "\t"))
+    def _readSpreadSheet(self,
+                         dataframe: pd.DataFrame) -> dict[str : Variable]:
+
+        variables = {}
+        for _, row in dataframe.iterrows():
             aux = {}
             for col in row.index:
 
@@ -53,37 +81,10 @@ class Configuration:
 
                 else: aux[col] = row[col]
 
-            variables.append(Variable(aux).fabrica())
+            variable = Variable(aux).fabrica()
+            variables[variable.name] = variable
 
         return variables
-
-
-
-    def _readJson(self,
-                  file: Path) -> list:
-
-        with open(file, "r") as jsonFile:
-            variables = json.load(jsonFile)
-
-        return [Variable(variable).fabrica() for variable in variables]
-
-
-
-    def jsonSchema(self) -> dict:
-
-        schema = {"type" : "object",
-                  "properties" : {"ID" : {}},
-                  "required" : ["ID"],
-                  "additionalProperties": False}
-
-        for variable in self._variables:
-
-            schema["properties"][variable.name] = variable.jsonSchema
-
-            if variable._variable["rules"]["required"]:
-                schema["required"].append(variable.name)
-
-        return schema
 
 
 
@@ -95,3 +96,57 @@ class Configuration:
                       outfile,
                       ensure_ascii = False,
                       indent = "    ")
+
+
+
+    def getVariables(self,
+                     **filt) -> dict[str : Variable]:
+
+        filteredVariables = {variable.name : variable for variable in self._variables.values()}
+        for filtName, filtValue in filt.items():
+
+            if isinstance(filtValue, (tuple, list, set)):
+                filteredVariables = {variable.name : variable for variable in filteredVariables.values()\
+                                     if not any([not element in getattr(variable, filtName) for element in filtValue])}
+
+            else:
+                filteredVariables = {variable.name : variable for variable in filteredVariables.values()\
+                                     if filtValue == getattr(variable, filtName)}
+
+        return filteredVariables
+
+
+
+    def getVariablesNames(self,
+                          **filt) -> list[str]:
+        return list(self.getVariables(**filt).keys())
+
+
+
+    @property
+    def jsonSchema(self) -> dict[str : Any]:
+
+        schema = {"type" : "object",
+                  "properties" : {"ID" : {"type" : "string"}},
+                  "required" : ["ID"],
+                  "additionalProperties": False}
+
+        for variable in self:
+
+            schema["properties"][variable.name] = variable.jsonSchema
+
+            if variable._variable["rules"]["required"]:
+                schema["required"].append(variable.name)
+
+        return schema
+
+
+
+    def __iter__(self) -> Iterator:
+        return iter(self._variables.values())
+
+
+
+    def __getitem__(self,
+                    index: str) -> Variable:
+        return self._variables[index]

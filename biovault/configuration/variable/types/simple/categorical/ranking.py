@@ -1,3 +1,5 @@
+from typing import Any, Union
+
 from biovault.configuration.variable.types.simple.categorical.ordinal import Ordinal
 
 class Ranking(Ordinal):
@@ -17,3 +19,10 @@ class Ranking(Ordinal):
             del variable["rules"]["enum"]
 
         return variable
+
+
+
+    def transformValueToPython(self, value: Any) -> Union[int, Any]:
+
+        try: return int(value)
+        except ValueError: return value

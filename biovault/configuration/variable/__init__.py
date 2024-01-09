@@ -1,4 +1,5 @@
-from typing import Any
+from typing import Any, Union
+from datetime import date
 
 class Variable:
 
@@ -39,6 +40,21 @@ class Variable:
         from biovault.configuration.variable.types.complex.object import Object
 
         return locals()[self.type.capitalize()](self._variable)
+
+
+
+    def transformValueToPython(self,
+                          value: Any) -> Any:
+        return value
+
+
+
+    def transformValueToJson(self,
+                             value: Any) -> Union[str, bool, int, float, list, dict]:
+
+        if isinstance(value, (str, bool, int, float, list, dict)): return value
+        else: return str(value)
+
 
 
     @property

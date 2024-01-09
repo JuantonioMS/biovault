@@ -1,6 +1,6 @@
 import jsonschema
 from pathlib import Path
-from typing import Union
+from typing import Union, Iterator
 
 from biovault.validator import BioVaultValidator
 from biovault.configuration import Configuration
@@ -81,22 +81,28 @@ class Database:
         """
 
         if isinstance(registers, list):
-            return Registers(*registers)
+            return Registers(*registers, configuration = self._configuration)
 
         else:
-            if registers.is_dir(): return Registers(*list(registers.iterdir()))
-            else: return Registers(registers)
+            if registers.is_dir(): return Registers(*list(registers.iterdir()), configuration = self._configuration)
+            else: return Registers(registers, configuration = self._configuration)
 
+
+    def iterConfiguration(self) -> Iterator:
+        return iter(self._configuration)
+
+    def iterRegisters(self) -> Registers:
+        return iter(self._registers)
 
 
     def checkRegisters(self) -> dict:
 
-        schema = BioVaultValidator(self._configuration.jsonSchema())
+        schema = BioVaultValidator(self._configuration.jsonSchema)
 
         errors = {}
         for register in self._registers:
 
-            validationErrors = sorted(schema.iter_errors(register._data),
+            validationErrors = sorted(schema.iter_errors(register.jsonDumpFormat),
                             key = lambda x: x.path)
 
             if validationErrors: errors[register._data["ID"]] = validationErrors

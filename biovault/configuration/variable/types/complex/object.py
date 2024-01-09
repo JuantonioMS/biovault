@@ -1,9 +1,11 @@
+from typing import Any
 from biovault.configuration.variable.types.complex import Complex
 
 class Object(Complex):
 
 
-    def _completeVariableInfo(self, variable: dict) -> dict:
+    def _completeVariableInfo(self,
+                              variable: dict) -> dict:
 
         from biovault.configuration.variable import Variable
 
@@ -20,7 +22,7 @@ class Object(Complex):
 
 
     @property
-    def jsonSchema(self) -> dict:
+    def jsonSchema(self) -> dict[str, Any]:
 
         schema = {"type" : "object"}
         for rule, value in self.jsonDumpFormat["rules"].items():
@@ -41,3 +43,38 @@ class Object(Complex):
         schema["required"] = [property.name for property in self._variable["rules"]["properties"] if property.jsonDumpFormat["rules"]["required"]]
 
         return schema
+
+
+# dict[str, Any] | Any
+
+    def transformValueToPython(self,
+                               value: dict[str, Any] | Any) -> dict[str, Any] | Any:
+
+        try:
+            if isinstance(value, dict):
+
+                newValue = {}
+                for name, value in value.items():
+                    newValue[name] = [variable for variable in self._variable["rules"]["properties"] if variable.name == name][0].transformValueToPython(value)
+
+                return newValue
+
+            else: return value
+
+        except ValueError: return value
+
+
+
+    def transformValueToJson(self,
+                             value: dict[str, Any] | Any) -> dict[str, Any] | Any:
+
+
+        if isinstance(value, dict):
+
+            newValue = {}
+            for name, value in value.items():
+                newValue[name] = [variable for variable in self._variable["rules"]["properties"] if variable.name == name][0].transformValueToJson(value)
+
+            return newValue
+
+        else: return super().transformValueToJson(value)

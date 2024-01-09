@@ -1,3 +1,5 @@
+from typing import Any, Union
+
 from biovault.configuration.variable.types.simple.numerical import Numerical
 
 class Integer(Numerical):
@@ -10,3 +12,10 @@ class Integer(Numerical):
         variable["rules"]["type"] = "integer"
 
         return variable
+
+
+
+    def transformValueToPython(self, value: Any) -> Union[int, Any]:
+
+        try: return int(value)
+        except ValueError: return value

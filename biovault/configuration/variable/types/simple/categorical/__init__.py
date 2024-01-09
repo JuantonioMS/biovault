@@ -1,3 +1,5 @@
+from typing import Any, Union
+
 from biovault.configuration.variable.types.simple import Simple
 
 class Categorical(Simple):
@@ -12,3 +14,10 @@ class Categorical(Simple):
             variable["rules"]["enum"] = [element.strip(" ") for element in variable["rules"]["enum"].split(";")]
 
         return variable
+
+
+
+    def transformValueToPython(self, value: Any) -> Union[str, Any]:
+
+        try: return str(value)
+        except ValueError: return value

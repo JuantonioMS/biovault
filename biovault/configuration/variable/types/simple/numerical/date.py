@@ -1,6 +1,7 @@
 from copy import deepcopy
 from datetime import date
 import pandas as pd
+from typing import Any, Union
 
 from biovault.configuration.variable.types.simple.numerical import Numerical
 
@@ -11,7 +12,7 @@ class Date(Numerical):
 
         variable = super()._completeVariableInfo(variable)
 
-        variable["rules"]["type"] = "string"
+        variable["rules"]["type"] = "date"
         variable["rules"]["format"] = "date"
 
         for edge in ["formatMinimum", "formatMaximum"]:
@@ -25,6 +26,7 @@ class Date(Numerical):
         return variable
 
 
+
     @property
     def jsonDumpFormat(self) -> dict:
         aux = deepcopy(super().jsonDumpFormat)
@@ -34,3 +36,24 @@ class Date(Numerical):
                 aux["rules"][edge] = aux["rules"][edge].strftime("%Y-%m-%d")
 
         return aux
+
+
+
+    def transformValueToPython(self,
+                               value: Any) -> Union[date, Any]:
+
+        try:
+
+            if isinstance(value, str): return date.fromisoformat(value)
+            elif isinstance(value, pd._libs.tslibs.timestamps.Timestamp): return value.to_pydatetime().date()
+            else: return value
+
+        except ValueError: return value
+
+
+
+    def transformValueToJson(self,
+                             value: Any) -> str:
+
+        if isinstance(value, date): return value.isoformat()
+        else: return super().transformValueToJson(value)
