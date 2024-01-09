@@ -21,7 +21,8 @@ class Register:
 
         if not "ID" in data: raise NameError("There is no ID field in data")
 
-        data["ID"] = str(data["ID"])
+        if isinstance(data["ID"], float): data["ID"] = str(int(data["ID"]))
+        else: data["ID"] = str(data["ID"])
 
         checkedData = {"ID" : data["ID"]}
         for name, value in data.items():

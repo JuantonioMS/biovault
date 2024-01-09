@@ -63,6 +63,7 @@ class Registers:
 
                     if sheetName in self._configuration.getVariablesNames(type = "list"):
 
+
                         if len(row.index) > 2:
 
                             register = Register({"ID" : row["ID"],
