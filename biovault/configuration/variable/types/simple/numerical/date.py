@@ -1,5 +1,5 @@
 from copy import deepcopy
-from datetime import date
+from datetime import date, datetime
 import pandas as pd
 from typing import Any, Union
 
@@ -46,6 +46,7 @@ class Date(Numerical):
 
             if isinstance(value, str): return date.fromisoformat(value)
             elif isinstance(value, pd._libs.tslibs.timestamps.Timestamp): return value.to_pydatetime().date()
+            elif isinstance(value, datetime): return value.date()
             else: return value
 
         except ValueError: return value

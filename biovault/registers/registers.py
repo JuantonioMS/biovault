@@ -56,7 +56,6 @@ class Registers:
         with pd.ExcelFile(file) as file:
 
             for sheetName in file.sheet_names:
-                print(sheetName)
 
                 dataframe = file.parse(sheetName)
 

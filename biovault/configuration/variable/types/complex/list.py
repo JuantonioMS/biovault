@@ -47,7 +47,6 @@ class List(Complex):
                 newValue = []
                 for element in value:
                     if isinstance(element, dict):
-                        print(element)
                         newValue.append(self._variable["rules"]["items"].transformValueToPython(element))
                     else:
                         newValue.append(self._variable["rules"]["items"].transformValueToPython(element))
