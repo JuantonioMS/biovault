@@ -15,7 +15,7 @@ class Date(Numerical):
         variable["rules"]["type"] = "date"
         variable["rules"]["format"] = "date"
 
-        for edge in ["formatMinimum", "formatMaximum"]:
+        for edge in ["dateMinimum", "dateMaximum"]:
 
             if edge in variable["rules"]:
                 if isinstance(variable["rules"][edge], str):
@@ -31,7 +31,7 @@ class Date(Numerical):
     def jsonDumpFormat(self) -> dict:
         aux = deepcopy(super().jsonDumpFormat)
 
-        for edge in ["formatMinimum", "formatMaximum"]:
+        for edge in ["dateMinimum", "dateMaximum"]:
             if edge in aux["rules"]:
                 aux["rules"][edge] = aux["rules"][edge].strftime("%Y-%m-%d")
 

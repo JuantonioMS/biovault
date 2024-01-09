@@ -24,7 +24,7 @@ def dateMaximum(validator, maximumDate, instance, schema):
         try: instance = date.fromisoformat(instance)
         except ValueError: flag = False
 
-    if flag and instance < maximumDate:
+    if flag and instance > maximumDate:
         yield jsonschema.ValidationError(f"{instance} is after maximum date {maximumDate}")
 
 

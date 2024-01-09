@@ -59,7 +59,7 @@ class Configuration:
                    file: Path) -> dict[str : Variable]:
 
         variables = {}
-        with pd.ExcelFile("tests/material/registers/xlsx/registers.xlsx") as file:
+        with pd.ExcelFile(file) as file:
             for sheetName in file.sheet_names:
                 variables.update(self._readSpreadSheet(file.parse(sheetName)))
 

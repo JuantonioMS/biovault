@@ -24,7 +24,9 @@ class Object(Complex):
     @property
     def jsonSchema(self) -> dict[str, Any]:
 
-        schema = {"type" : "object"}
+        schema = {"type" : "object",
+                  "additionalProperties": False}
+
         for rule, value in self.jsonDumpFormat["rules"].items():
 
             if rule in ["required"]: continue
