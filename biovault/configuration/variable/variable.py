@@ -105,14 +105,14 @@ class Variable:
 
     @property
     def rules(self) -> None:
-        try: return Rules(self, self._variable["rules"])
-        except KeyError: return Rules(self, {})
+        try: return self._variable["rules"]
+        except KeyError: return {}
 
 
     @property
     def controls(self) -> None:
-        try: return Controls(self, self._variable["controls"])
-        except KeyError: return Controls(self, [])
+        try: return self._variable["controls"]
+        except KeyError: return []
 
 
     @property
@@ -131,16 +131,3 @@ class Variable:
             schema[rule] = value
 
         return schema
-
-
-
-class Rules:
-
-    def __init__(self, variable: Any, rules: dict) -> None:
-        self._rules = rules
-
-
-class Controls:
-
-    def __init__(self, variable: Any, controls: list) -> None:
-        self._controls = controls

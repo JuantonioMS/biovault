@@ -1,6 +1,7 @@
 import jsonschema
 from pathlib import Path
-from typing import Union, Iterator
+import pandas as pd
+from typing import Any, Union, Iterator
 
 from biovault.validator import BioVaultValidator
 from biovault.configuration import Configuration
@@ -88,55 +89,74 @@ class Database:
             else: return Registers(registers, configuration = self._configuration)
 
 
+
     def iterConfiguration(self) -> Iterator:
         return iter(self._configuration)
+
+
 
     def iterRegisters(self) -> Registers:
         return iter(self._registers)
 
 
-    def checkRegisters(self) -> dict:
 
-        schema = BioVaultValidator(self._configuration.jsonSchema)
+    def check(self) -> pd.DataFrame:
 
-        errors = {}
-        for register in self._registers:
+        dataframe = {"ID"        : [],
+                     "Section"   : [],
+                     "Variable"  : [],
+                     "Value"     : [],
+                     "Validator" : [],
+                     "Message"   : []}
 
-            validationErrors = sorted(schema.iter_errors(register.jsonDumpFormat),
-                            key = lambda x: x.path)
+        for id, sections in self._registers.check().items():
+            for section, errors in sections.items():
+                for error in errors:
+                    dataframe["ID"].append(id)
+                    dataframe["Section"].append(section)
+                    dataframe["Variable"].append(error["variable"])
+                    dataframe["Value"].append(error["value"])
+                    dataframe["Validator"].append(error["validator"])
+                    dataframe["Message"].append(error["message"])
 
-            if validationErrors: errors[register._data["ID"]] = validationErrors
-
-        return errors
+        return pd.DataFrame(dataframe)
 
 
 
-    def checkRegistersToTsv(self,
-                            file: Path) -> None:
+    def checkRules(self) -> pd.DataFrame:
 
-        errors = self.checkRegisters()
+        dataframe = {"ID"        : [],
+                     "Variable"  : [],
+                     "Value"     : [],
+                     "Validator" : [],
+                     "Message"   : []}
 
-        msg = ["\t".join(["ID",
-                          "Variable",
-                          "Value",
-                          "Validator",
-                          "Message"])]
-        for id, errors in errors.items():
-
+        for id, errors in self._registers.checkRules().items():
             for error in errors:
+                dataframe["ID"].append(id)
+                dataframe["Variable"].append(error["variable"])
+                dataframe["Value"].append(error["value"])
+                dataframe["Validator"].append(error["validator"])
+                dataframe["Message"].append(error["message"])
 
-                name = ".".join(list(map(str,error.path)))
-                if error.validator == "required":
-                    if name: name += "." + error.message.split(" ")[0].strip("'")
-                    else: name = error.message.split(" ")[0].strip("'")
+        return pd.DataFrame(dataframe)
 
-                instance = str(error.instance) if error.validator != "required" else "None"
 
-                msg.append("\t".join([str(id),
-                                      name,
-                                      instance,
-                                      error.validator,
-                                      error.message]))
 
-        with open(file, "w") as outfile:
-            outfile.write("\n".join(msg))
+    def checkControls(self) -> pd.DataFrame:
+
+        dataframe = {"ID"        : [],
+                     "Variable"  : [],
+                     "Value"     : [],
+                     "Validator" : [],
+                     "Message"   : []}
+
+        for id, errors in self._registers.checkControls().items():
+            for error in errors:
+                dataframe["ID"].append(id)
+                dataframe["Variable"].append(error["variable"])
+                dataframe["Value"].append(error["value"])
+                dataframe["Validator"].append(error["validator"])
+                dataframe["Message"].append(error["message"])
+
+        return pd.DataFrame(dataframe)

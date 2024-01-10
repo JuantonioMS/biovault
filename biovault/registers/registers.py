@@ -28,6 +28,33 @@ class Registers:
 
 
 
+    def check(self,
+              configuration: Configuration = None) -> dict[str : dict[str : list[dict[str : Any]]]]:
+
+        if configuration is None: configuration = self._configuration
+
+        return {register.id : register.check(configuration) for register in self}
+
+
+
+    def checkRules(self,
+                   configuration: Configuration = None) -> dict[str : list[dict[str : Any]]]:
+
+        if configuration is None: configuration = self._configuration
+
+        return {register.id : register.checkRules(configuration) for register in self}
+
+
+
+    def checkControls(self,
+                      configuration: Configuration = None) -> dict[str : list[dict[str : Any]]]:
+
+        if configuration is None: configuration = self._configuration
+
+        return {register.id : register.checkControls(configuration) for register in self}
+
+
+
     def _readFiles(self,
                    *args) -> dict[str : Register]:
 

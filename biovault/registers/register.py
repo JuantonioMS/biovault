@@ -3,6 +3,7 @@ from datetime import date
 import pandas as pd
 
 from biovault.configuration import Configuration
+from biovault.validator import BioVaultValidator
 
 class Register:
 
@@ -16,6 +17,65 @@ class Register:
         self._data = self._readData(data)
 
         self._completeFormulas()
+
+
+
+    def check(self,
+              configuration: Configuration = None) -> dict[str : list[dict[str : Any]]]:
+
+        if configuration is None: configuration = self._configuration
+
+        return {"rule": self.checkRules(configuration),
+                "control": self.checkControls(configuration)}
+
+
+    def checkRules(self,
+                   configuration: Configuration = None) -> list[dict[str : Any]]:
+
+        if configuration is None: configuration = self._configuration
+
+        schema = BioVaultValidator(configuration.jsonSchema)
+
+        errors = sorted(schema.iter_errors(self.jsonDumpFormat),
+                        key = lambda x: x.path)
+
+        aux = []
+        for error in errors:
+
+            name = ".".join(list(map(str,error.path)))
+            if error.validator == "required":
+                if name: name += "." + error.message.split(" ")[0].strip("'")
+                else: name = error.message.split(" ")[0].strip("'")
+
+            instance = error.instance if error.validator != "required" else None
+
+            aux.append({"variable"  : name,
+                        "value"     : instance,
+                        "validator" : error.validator,
+                        "message"   : error.message})
+
+        return aux
+
+
+
+    def checkControls(self,
+                      configuration: Configuration = None) -> list[dict[str : Any]]:
+
+        if configuration is None: configuration = self._configuration
+
+        aux = []
+        for variable in configuration:
+            for control in variable.controls:
+                result = evalSentence(control["control"], self = self)
+
+                if not result is None and not result:
+
+                    aux.append({"variable"  : variable.name,
+                                "value"     : variable.transformValueToJson(self[variable.name]),
+                                "validator" : control["control"],
+                                "message"   : control["message"] if "message" in control else ""})
+
+        return aux
 
 
 

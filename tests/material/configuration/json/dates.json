@@ -5,11 +5,28 @@
         "rules": {
             "required": true,
             "dateMinimum": "1995-01-01",
-            "dateMaximum": "2023-12-31",
-            "type": "string",
-            "format": "date"
+            "dateMaximum": "2023-12-31"
         },
-        "info": {},
-        "controls": []
+        "controls": [
+            {
+                "control": "self['birth_day'] <= self['death_day']",
+                "message": "Birth comes after death"
+            }
+        ]
+    },
+    {
+        "name": "death_day",
+        "type": "date",
+        "rules": {
+            "required": true,
+            "dateMinimum": "1900-01-01",
+            "dateMaximum": "2100-12-31"
+        },
+        "controls": [
+            {
+                "control": "self['birth_day'] <= self['death_day']",
+                "message": "Death comes before birth"
+            }
+        ]
     }
 ]
