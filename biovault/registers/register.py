@@ -15,6 +15,20 @@ class Register:
 
         self._data = self._readData(data)
 
+        self._completeFormulas()
+
+
+
+    def _completeFormulas(self) -> None:
+
+        for variable in [variable for variable in self._configuration if variable.isFormula()]:
+
+            value = evalSentence(variable.formula, self = self)
+
+            if not value is None:
+                self._data[variable.name] = variable.transformValueToPython(value)
+
+
 
     def _readData(self,
                   data: dict[str : Any]) -> dict[str : Any]:
@@ -33,6 +47,7 @@ class Register:
         return checkedData
 
 
+
     @property
     def jsonDumpFormat(self) -> dict[str, str | bool | int | float | list| dict]:
 
@@ -43,6 +58,7 @@ class Register:
             jsonFormat[name] = self._configuration[name].transformValueToJson(value)
 
         return jsonFormat
+
 
 
     @property
@@ -68,6 +84,8 @@ class Register:
 
         return self
 
+
+
     def __getitem__(self,
                     index: str) -> Any:
 
@@ -80,5 +98,17 @@ class Register:
             raise KeyError(f"{index} is not present in this database")
 
 
+
     def __iter__(self) -> Iterator:
         return iter(self._data.items())
+
+
+
+def evalSentence(sentence, **kwargs):
+
+    locals().update(kwargs) #  Actualiza las variables locales
+
+    try:
+        return eval(sentence)
+    except (ValueError, TypeError, NameError, KeyError, IndexError):
+        return None

@@ -1,0 +1,14 @@
+[
+    {
+		"name": "imc",
+		"type": "float",
+		"rules": {
+			"minimum": 0.0,
+			"maximum": 40.0
+        },
+		"info": {
+			"description": "Índice de masa corporal",
+            "formula": "round(self['weight'] / pow(self['height'] / 100, 2), 2)"
+		}
+    }
+]

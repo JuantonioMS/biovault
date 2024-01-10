@@ -56,6 +56,19 @@ class Variable:
 
 
 
+    def isFormula(self) -> bool:
+        return "formula" in self._variable["info"]
+
+    @property
+    def formula(self) -> str | None:
+
+        if self.isFormula():
+            return self._variable["info"]["formula"]
+
+        else:
+            return None
+
+
     @property
     def name(self) -> str:
         return self._variable["name"]
