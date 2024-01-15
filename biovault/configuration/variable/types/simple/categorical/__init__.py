@@ -19,5 +19,5 @@ class Categorical(Simple):
 
     def transformValueToPython(self, value: Any) -> Union[str, Any]:
 
-        try: return str(value)
-        except ValueError: return value
+        try: return str(value).strip(" \n\t\r_-,./;+*")
+        except ValueError: return super().transformValueToPython(value)

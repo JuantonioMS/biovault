@@ -78,6 +78,7 @@ class Configuration:
 
         variables = {}
         for _, row in dataframe.iterrows():
+
             aux = {}
             for col in row.index:
 

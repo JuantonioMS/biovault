@@ -141,7 +141,7 @@ class Registers:
                                             configuration = self._configuration)
 
                     registers = self._updateRegisters(registers,
-                                                    {row["ID"] : register})
+                                                    {register.id : register})
 
 
         return registers

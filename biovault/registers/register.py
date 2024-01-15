@@ -96,12 +96,12 @@ class Register:
         if not "ID" in data: raise NameError("There is no ID field in data")
 
         if isinstance(data["ID"], float): data["ID"] = str(int(data["ID"]))
-        else: data["ID"] = str(data["ID"])
+        else: data["ID"] = str(data["ID"]).strip(" \n\r\t")
 
         checkedData = {"ID" : data["ID"]}
         for name, value in data.items():
 
-            if name == "ID": continue
+            if name == "ID" or not name in self._configuration.getVariablesNames(): continue
             checkedData[name] = self._configuration[name].transformValueToPython(value)
 
         return checkedData

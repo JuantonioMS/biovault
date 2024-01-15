@@ -25,4 +25,4 @@ class Ranking(Ordinal):
     def transformValueToPython(self, value: Any) -> Union[int, Any]:
 
         try: return int(value)
-        except ValueError: return value
+        except ValueError: return super().transformValueToPython(value)
