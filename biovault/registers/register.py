@@ -16,8 +16,6 @@ class Register:
 
         self._data = self._readData(data)
 
-        self._completeFormulas()
-
 
 
     def check(self,
@@ -78,15 +76,23 @@ class Register:
         return aux
 
 
-
-    def _completeFormulas(self) -> None:
+    def _executeFormulas(self) -> None:
 
         for variable in [variable for variable in self._configuration if variable.isFormula()]:
 
-            value = evalSentence(variable.formula, self = self)
+            if variable.type == "list":
+                value = variable._applyFormula(self)
+                if value: self._data[variable.name] = value
 
-            if not value is None:
-                self._data[variable.name] = variable.transformValueToPython(value)
+            else:
+                value = variable._applyFormula(self)
+
+                if not value is None:
+                    if variable.type == "object":
+                        if variable.name in self._data: self._data[variable.name].update(value)
+                        else: self._data[variable.name] = value
+
+                    else: self._data[variable.name] = value
 
 
 

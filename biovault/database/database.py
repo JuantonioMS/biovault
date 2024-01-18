@@ -38,6 +38,8 @@ class Database:
         if not registers is None:
             self._registers = self._readRegisters(registers)
 
+        self._registers._executeFormulas()
+
 
 
     def _readConfiguration(self,

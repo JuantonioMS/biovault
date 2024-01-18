@@ -175,5 +175,16 @@ class Registers:
 
 
 
+    def _executeFormulas(self) -> None:
+        for register in self: register._executeFormulas()
+
+
+
+    def __getitem__(self,
+                    value: str) -> Register:
+        return self._registers[value]
+
+
+
     def __iter__(self) -> Iterator:
         return iter(self._registers.values())

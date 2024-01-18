@@ -18,4 +18,4 @@ class Integer(Numerical):
     def transformValueToPython(self, value: Any) -> Union[int, Any]:
 
         try: return int(value)
-        except ValueError: return value
+        except (ValueError, TypeError): return super().transformValueToPython(value)

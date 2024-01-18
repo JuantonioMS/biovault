@@ -22,6 +22,34 @@ class Variable:
 
 
 
+    def _applyFormula(self,
+                     register) -> Any:
+
+        value = self._evalSentence(self.formula,
+                                   imports = self.imports,
+                                   register = register)
+
+        return self.transformValueToPython(value)
+
+
+
+    @staticmethod
+    def _evalSentence(sentence: str,
+                     imports: list = [],
+                     **kwargs) -> Any:
+
+        for element in imports:
+            exec(element)
+
+        locals().update(kwargs)
+
+        try:
+            return eval(sentence)
+        except (ValueError, TypeError, NameError, KeyError, IndexError):
+            return None
+
+
+
     def fabrica(self) -> Any:
 
         from biovault.configuration.variable.types.simple.numerical.integer import Integer
@@ -67,6 +95,15 @@ class Variable:
 
         else:
             return None
+
+
+
+    @property
+    def imports(self) -> list[str]:
+
+        try: return self._variable["info"]["imports"]
+        except KeyError: return []
+
 
 
     @property

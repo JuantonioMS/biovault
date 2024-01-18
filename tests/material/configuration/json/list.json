@@ -33,7 +33,19 @@
 			                    "maximum": 4000,
 			                    "required": true
                             }
+                        },
+
+                        {
+                            "name": "independent_gpu",
+                            "type": "boolean",
+                            "rules": {
+                                "required": true
+                            },
+                            "info": {
+                                "formula": "True if own['gpu'] == 'intel' else False"
+                            }
                         }
+
                     ],
                     "info": {
                         "description": "Características del ordenador"

@@ -11,9 +11,9 @@ class Object(Complex):
 
         variable = super()._completeVariableInfo(variable)
 
-        aux = []
+        aux = {}
         for property in variable["rules"]["properties"]:
-            aux.append(Variable(property).fabrica())
+            aux[property["name"]] = Variable(property).fabrica()
 
         variable["rules"]["properties"] = aux
 
@@ -34,7 +34,7 @@ class Object(Complex):
             if rule == "properties":
 
                 aux = {}
-                for property in value:
+                for property in self.properties.values():
                     aux[property.name] = property.jsonSchema
 
                 schema[rule] = aux
@@ -42,12 +42,11 @@ class Object(Complex):
 
             schema[rule] = value
 
-        schema["required"] = [property.name for property in self._variable["rules"]["properties"] if property.jsonDumpFormat["rules"]["required"]]
+        schema["required"] = [property.name for property in self.properties.values() if property.jsonDumpFormat["rules"]["required"]]
 
         return schema
 
 
-# dict[str, Any] | Any
 
     def transformValueToPython(self,
                                value: dict[str, Any] | Any) -> dict[str, Any] | Any:
@@ -57,7 +56,7 @@ class Object(Complex):
 
                 newValue = {}
                 for name, value in value.items():
-                    newValue[name] = [variable for variable in self._variable["rules"]["properties"] if variable.name == name][0].transformValueToPython(value)
+                    newValue[name] = self.properties[name].transformValueToPython(value)
 
                 return newValue
 
@@ -75,8 +74,58 @@ class Object(Complex):
 
             newValue = {}
             for name, value in value.items():
-                newValue[name] = [variable for variable in self._variable["rules"]["properties"] if variable.name == name][0].transformValueToJson(value)
+                newValue[name] = self.properties[name].transformValueToJson(value)
 
             return newValue
 
         else: return super().transformValueToJson(value)
+
+
+
+    @property
+    def properties(self) -> dict[str : Any]:
+        try: return self._variable["rules"]["properties"]
+        except KeyError: return {}
+
+
+
+    def isNestedFormula(self) -> bool:
+        return any([element.isFormula() for element in self.properties.values()])
+
+
+
+    def _applyFormula(self, register, object = None) -> Any:
+
+        if self.isNestedFormula():
+
+            buffer = {property.name : False for property in self.properties.values() if property.isFormula()}
+            results = {}
+
+            lengthStart, lengthEnd = 0, -1
+
+            while lengthStart != lengthEnd:
+                lengthStart = len(results)
+
+                object = object if not object is None else register[self.name]
+                if object is None: return None
+
+                own = object | results
+
+                for propertyName in buffer:
+
+                    if not buffer[propertyName]:
+                        property = self.properties[propertyName]
+
+                        value = self._evalSentence(property.formula,
+                                                   imports = property.imports,
+                                                   register = register,
+                                                   own = own)
+
+                        if not value is None: results[property.name] = property.transformValueToPython(value)
+
+                lengthEnd = len(results)
+
+            return results
+
+        else:
+            return super()._applyFormula(register)

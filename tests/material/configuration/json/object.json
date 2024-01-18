@@ -51,6 +51,28 @@
                     "info": {
                         "description": "Fecha de compra"
                     }
+                },
+
+                {
+                    "name": "is_not_from_japan",
+                    "type": "boolean",
+                    "rules": {
+                        "required": true
+                    },
+                    "info": {
+                        "formula": "not own['is_from_japan']"
+                    }
+                },
+
+                {
+                    "name": "is_from_japan",
+                    "type": "boolean",
+                    "rules": {
+                        "required": true
+                    },
+                    "info": {
+                        "formula": "True if own['brand'] in ['nissan', 'toyota'] else False"
+                    }
                 }
             ],
             "required": true

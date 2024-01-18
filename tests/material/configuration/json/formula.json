@@ -8,7 +8,7 @@
         },
 		"info": {
 			"description": "Índice de masa corporal",
-            "formula": "round(self['weight'] / pow(self['height'] / 100, 2), 2)"
+            "formula": "round(register['weight'] / pow(register['height'] / 100, 2), 2)"
 		}
     }
 ]

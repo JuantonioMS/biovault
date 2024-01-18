@@ -7,4 +7,4 @@ class Float(Numerical):
     def transformValueToPython(self, value: Any) -> Union[float, Any]:
 
         try: return float(value)
-        except ValueError: return value
+        except (ValueError, TypeError): return super().transformValueToPython(value)

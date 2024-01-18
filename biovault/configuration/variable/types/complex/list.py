@@ -73,3 +73,34 @@ class List(Complex):
             return newValue
 
         else: return super().transformValueToJson(value)
+
+
+
+    @property
+    def items(self) -> Any:
+        return self._variable["rules"]["items"]
+
+
+    def isNestedFormula(self) -> bool:
+        return self._variable["rules"]["items"].isFormula()
+
+
+
+    def _applyFormula(self, register, object = None) -> Any:
+
+        if self.isNestedFormula():
+            aux = []
+
+            if object is None: object = register[self.name]
+
+            for element in object if not object is None else []:
+
+                #if object is None: object = element
+
+                value = self.items._applyFormula(register, object = element)
+                aux.append(element | value)
+
+            return aux
+
+        else:
+            return super()._applyFormula(register)
