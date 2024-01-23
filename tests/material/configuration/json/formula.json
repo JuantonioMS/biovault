@@ -10,5 +10,14 @@
 			"description": "Índice de masa corporal",
             "formula": "round(register['weight'] / pow(register['height'] / 100, 2), 2)"
 		}
-    }
+    },
+
+	{
+		"name": "postal_code",
+	 	"type": "string",
+		"info": {
+			"imports" : ["from scripts.functions import formatPostalCode"],
+			"formula": "formatPostalCode(register)"
+		}
+	}
 ]

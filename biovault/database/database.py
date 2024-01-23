@@ -2,6 +2,7 @@ import jsonschema
 from pathlib import Path
 import pandas as pd
 from typing import Any, Union, Iterator
+import os
 
 from biovault.validator import BioVaultValidator
 from biovault.configuration import Configuration
@@ -15,7 +16,8 @@ class Database:
 
     def __init__(self,
                  configuration: Union[Path, list[Path]] = None,
-                 registers: Union[Path, list[Path]] = None) -> None:
+                 registers: Union[Path, list[Path]] = None,
+                 scripts: Path = None) -> None:
 
         """
         Método de inicialización.
@@ -32,6 +34,8 @@ class Database:
                 list[Path]       : listado de archivos de registro.
         """
 
+        self._scripts = self._readScripts(scripts)
+
         if not configuration is None:
             self._configuration = self._readConfiguration(configuration)
 
@@ -39,6 +43,20 @@ class Database:
             self._registers = self._readRegisters(registers)
 
         self._registers._executeFormulas()
+
+
+
+    def _readScripts(self,
+                     scripts: Path) -> Path:
+
+
+        if "scripts" in os.listdir():
+            os.system("rm -rf scripts")
+
+        if not scripts is None:
+            os.system(f"ln -s {scripts} scripts")
+
+        return scripts
 
 
 
@@ -162,3 +180,9 @@ class Database:
                 dataframe["Message"].append(error["message"])
 
         return pd.DataFrame(dataframe)
+
+
+    def __del__(self) -> None:
+
+        if "scripts" in os.listdir():
+            os.system("rm -rf scripts")
