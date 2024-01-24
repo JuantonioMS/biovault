@@ -1,56 +1,80 @@
 from typing import Any, Union
 
+from biovault.registers.register import Register
+
+DEFAULT_TYPE = "string"
+DEFAULT_RULES_REQUIRED = False
+
 class Variable:
 
 
-    def __init__(self, variable: dict) -> None:
+    #%%  INITIALIZATION METHODS_________________________________________________________________________________________
 
-        self._variable = self._completeVariableInfo(variable)
+    def __init__(self,
+                 variable: dict[str : Any],
+                 widespread: dict[str : Any] = None) -> None:
+
+        self._variable = self._completeVariableInfo(variable,
+                                                    widespread if not widespread is None else {})
 
 
-    def _completeVariableInfo(self, variable: dict) -> dict:
 
+    def _completeVariableInfo(self,
+                              variable: dict[str : Any],
+                              widespread: dict[str : Any]) -> dict:
+
+        """
+        Complete the variable info with the widespread info.
+
+        Args:
+            variable (dict)  : variable info.
+            widespread (dict): widespread info.
+
+        Returns:
+            dict: completed variable info.
+        """
+
+        #  1. Assign name section
+        #  TODO: Design a useful system to assign names by widespread
+
+        #  2. Assign type section
+        if not "type" in variable:
+            if "type" in widespread: variable["type"] = widespread["type"] #  Spread type
+            else: variable["type"] = DEFAULT_TYPE #  Type by default
+
+        #  3. Assign info section
         if not "info" in variable: variable["info"] = {}
-        if not "rules" in variable: variable["rules"] = {}
-        if not "controls" in variable: variable["controls"] = []
 
-        # Por defecto, las variables no son obligatorias de aparecer en el registro
-        if not "required" in variable["rules"]: variable["rules"]["required"] = False
-        else: variable["rules"]["required"] = bool(variable["rules"]["required"])
+        if "info" in widespread and "groups" in widespread["info"]:
+            try: #  Update variable info groups
+                variable["info"]["groups"] = set(variable["info"]["groups"]) | set(widespread["info"]["groups"])
+            except KeyError: #  Set widespread info groups as variable info groups
+                variable["info"]["groups"] = widespread["info"]["groups"]
+
+        #  4. Assign rules section
+        if not "rules" in variable: variable["rules"] = {}
+
+        if "rules" in widespread:
+            for rule in widespread["rules"]:
+                if rule not in variable["rules"]:
+                    variable["rules"][rule] = widespread["rules"][rule]
+
+        if not "required" in variable["rules"]:
+            variable["rules"]["required"] = DEFAULT_RULES_REQUIRED
+
+        #  5. Assign controls section
+        if not "controls" in variable: variable["controls"] = []
 
         return variable
 
 
 
-    def _applyFormula(self,
-                     register) -> Any:
+    def factory(self) -> Any:
 
-        value = self._evalSentence(self.formula,
-                                   imports = self.imports,
-                                   register = register)
-
-        return self.transformValueToPython(value)
-
-
-
-    @staticmethod
-    def _evalSentence(sentence: str,
-                     imports: list = [],
-                     **kwargs) -> Any:
-
-        for element in imports:
-            exec(element)
-
-        locals().update(kwargs)
-
-        try:
-            return eval(sentence)
-        except (ValueError, TypeError, NameError, KeyError, IndexError):
-            return None
-
-
-
-    def fabrica(self) -> Any:
+        """
+        Return the variable object instance with an especific variable type instance.
+        It is a Factory Method Pattern Design.
+        """
 
         from biovault.configuration.variable.types.simple.numerical.integer import Integer
         from biovault.configuration.variable.types.simple.numerical.float import Float
@@ -70,8 +94,70 @@ class Variable:
 
 
 
+    #%%  GENERAL PROPERTIES METHODS_____________________________________________________________________________________
+
+    @property
+    def name(self) -> str:
+        return self._variable["name"]
+
+
+
+    @property
+    def type(self) -> str:
+        return self._variable["type"]
+
+
+
+    #  GENERAL PROPERTIES INFO METHODS__________________________________________________________________________________
+
+    @property
+    def info(self) -> dict[str : Any]:
+        return self._variable["info"]
+
+
+
+    @property
+    def longName(self) -> str:
+        try: return self.info["longName"]
+        except KeyError: return self.name
+
+
+
+    @property
+    def description(self) -> str:
+        try: return self.info["description"]
+        except KeyError: return ""
+
+
+
+    @property
+    def groups(self) -> set[str]:
+        try: return self.info["groups"]
+        except KeyError: return set()
+
+
+
+
+    #  GENERAL PROPERTIES RULES METHODS_________________________________________________________________________________
+
+    @property
+    def rules(self) -> dict[str : Any]:
+        return self._variable["rules"]
+
+
+
+    #  GENERAL PROPERTIES CONTROLS METHODS______________________________________________________________________________
+
+    @property
+    def controls(self) -> list[dict]:
+        return self._variable["rules"]
+
+
+
+    #%%  TRANSFORM METHODS______________________________________________________________________________________________
+
     def transformValueToPython(self,
-                          value: Any) -> Any:
+                               value: Any) -> Any:
         return value
 
 
@@ -84,73 +170,7 @@ class Variable:
 
 
 
-    def isFormula(self) -> bool:
-        return "formula" in self._variable["info"]
-
-    @property
-    def formula(self) -> str | None:
-
-        if self.isFormula():
-            return self._variable["info"]["formula"]
-
-        else:
-            return None
-
-
-
-    @property
-    def imports(self) -> list[str]:
-
-        try: return self._variable["info"]["imports"]
-        except KeyError: return []
-
-
-
-    @property
-    def name(self) -> str:
-        return self._variable["name"]
-
-
-    @property
-    def type(self) -> str:
-        return self._variable["type"]
-
-
-    @property
-    def longName(self) -> str:
-        try: return self._variable["info"]["longName"]
-        except KeyError: return self.name
-
-
-    @property
-    def description(self) -> str:
-        try: return self._variable["info"]["description"]
-        except KeyError: return ""
-
-
-    @property
-    def groups(self) -> set:
-        try: return self._variable["info"]["groups"]
-        except KeyError: return set()
-
-
-    @property
-    def format(self) -> str:
-        try: return self._variable["info"]["format"]
-        except KeyError: return ""
-
-
-    @property
-    def rules(self) -> None:
-        try: return self._variable["rules"]
-        except KeyError: return {}
-
-
-    @property
-    def controls(self) -> None:
-        try: return self._variable["controls"]
-        except KeyError: return []
-
+    #%%  JSON METHODS___________________________________________________________________________________________________
 
     @property
     def jsonDumpFormat(self) -> dict:
@@ -168,3 +188,57 @@ class Variable:
             schema[rule] = value
 
         return schema
+
+
+
+    #%%  FORMULA METHODS________________________________________________________________________________________________
+
+    def isFormula(self) -> bool:
+        return "formula" in self.info
+
+
+
+    @property
+    def formula(self) -> str:
+
+        if not self.isFormula(): return ""
+
+        else:
+            if isinstance(self.info["formula"], dict):
+                return self.info["formula"]["formula"]
+
+            else: return self.info["formula"]
+
+
+
+    @property
+    def imports(self) -> list[str]:
+
+        try: return self._variable["info"]["imports"]
+        except (KeyError, TypeError): return []
+
+
+
+    def _applyFormula(self,
+                     register: Register) -> Any:
+
+        value = self._evalSentence(self.formula,
+                                   imports = self.imports,
+                                   register = register)
+
+        return self.transformValueToPython(value)
+
+
+
+    @staticmethod
+    def _evalSentence(sentence: str,
+                     imports: list[str] = [],
+                     **kwargs) -> Any:
+
+        for element in imports:
+            exec(element)
+
+        locals().update(kwargs)
+
+        try: return eval(sentence)
+        except (ValueError, TypeError, NameError, KeyError, IndexError): return None
