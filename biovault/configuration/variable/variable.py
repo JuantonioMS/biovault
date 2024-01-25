@@ -1,6 +1,5 @@
-from typing import Any, Union
-
-from biovault.registers.register import Register
+from typing import Any, Union, TypeVar
+Register = TypeVar("Register")
 
 DEFAULT_TYPE = "string"
 DEFAULT_RULES_REQUIRED = False
