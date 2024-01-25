@@ -3,13 +3,15 @@ import json
 from pathlib import Path
 from typing import Any, Iterator
 
-from biovault.configuration.variable  import Variable
+from biovault.configuration.variable import Variable
 
 class Configuration:
 
     """
     Clase de configuración que alberga las normas de una base de datos.
     """
+
+    #%%  INITIALIZATION METHODS_________________________________________________________________________________________
 
     def __init__(self,
                  *args) -> None:
@@ -24,6 +26,8 @@ class Configuration:
         self._variables = self._readFiles(*args)
 
 
+
+    #%%  IMPORT METHODS_________________________________________________________________________________________
 
     def _readFiles(self,
                    *args) -> dict[str : Variable]:
@@ -46,14 +50,25 @@ class Configuration:
 
 
 
+    #  JSON FILES_______________________________________________________________________________________________________
+
     def _readJson(self,
                   file: Path) -> dict[str : Variable]:
 
-        with open(file, "r") as jsonFile: variables = json.load(jsonFile)
+        with open(file, "r") as jsonFile: jsonInfo = json.load(jsonFile)
 
-        return {variable.name : variable for variable in [Variable(variable).fabrica() for variable in variables]}
+        if isinstance(jsonInfo, list):
+            variables, widespread = jsonInfo, {}
+
+        else:
+            variables, widespread = jsonInfo["variables"], jsonInfo["widespread"]
+
+        return {variable.name : variable for variable in [Variable(variable, widespread = widespread).factory() \
+                for variable in variables]}
 
 
+
+    #  SPREADSHEET FILES________________________________________________________________________________________________
 
     def _readExcel(self,
                    file: Path) -> dict[str : Variable]:
@@ -93,23 +108,14 @@ class Configuration:
 
                 else: aux[col] = row[col]
 
-            variable = Variable(aux).fabrica()
+            variable = Variable(aux).factory()
             variables[variable.name] = variable
 
         return variables
 
 
 
-    def save(self,
-             file: Path) -> None:
-
-        with open(file, "w") as outfile:
-            json.dump([variable.jsonDumpFormat for variable in self._variables],
-                      outfile,
-                      ensure_ascii = False,
-                      indent = "    ")
-
-
+    #%%  GETTERS METHODS________________________________________________________________________________________________
 
     def getVariables(self,
                      **filt) -> dict[str : Variable]:
@@ -135,6 +141,8 @@ class Configuration:
 
 
 
+    #%%  JSON METHODS___________________________________________________________________________________________________
+
     @property
     def jsonSchema(self) -> dict[str : Any]:
 
@@ -154,6 +162,8 @@ class Configuration:
 
 
 
+    #%%  MAGIC METHODS__________________________________________________________________________________________________
+
     def __iter__(self) -> Iterator:
         return iter(self._variables.values())
 
@@ -162,3 +172,16 @@ class Configuration:
     def __getitem__(self,
                     index: str) -> Variable:
         return self._variables[index]
+
+
+
+    #%%  TODO
+
+    def save(self,
+            file: Path) -> None:
+
+        with open(file, "w") as outfile:
+            json.dump([variable.jsonDumpFormat for variable in self._variables],
+                      outfile,
+                      ensure_ascii = False,
+                      indent = "    ")
