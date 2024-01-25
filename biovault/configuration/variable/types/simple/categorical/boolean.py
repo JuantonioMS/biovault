@@ -5,14 +5,13 @@ from biovault.configuration.variable.types.simple.categorical.binomial import Bi
 class Boolean(Binomial):
 
 
-    def _completeVariableInfo(self, variable: dict) -> dict:
+    @property
+    def jsonSchema(self) -> dict[str : Any]:
 
-        variable = super()._completeVariableInfo(variable)
+            schema = super().jsonSchema
+            schema["type"] = "boolean"
 
-        variable["rules"]["type"] = "boolean"
-        variable["rules"]["enum"] = [True, False]
-
-        return variable
+            return schema
 
 
 

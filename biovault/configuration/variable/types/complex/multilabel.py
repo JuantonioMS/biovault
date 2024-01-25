@@ -8,6 +8,9 @@ class Multilabel(List):
                                value: list[Any] | Any) -> list[Any] | Any:
 
         try:
-            return [self._variable["rules"]["items"].transformValueToPython(element) for element in value.split(";")]
+            if isinstance(value, str):
+                return [self._variable["rules"]["items"].transformValueToPython(element) for element in value.split(";")]
+            else:
+                return [str(element) for element in value]
 
         except ValueError: return super().transformValueToPython(value)

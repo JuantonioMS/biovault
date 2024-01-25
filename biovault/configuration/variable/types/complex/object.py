@@ -5,17 +5,18 @@ class Object(Complex):
 
 
     def _completeVariableInfo(self,
-                              variable: dict) -> dict:
+                              variable: dict[str : Any],
+                              widespread: dict[str : Any]) -> dict[str : Any]:
+
+        variable = super()._completeVariableInfo(variable, widespread)
 
         from biovault.configuration.variable import Variable
 
-        variable = super()._completeVariableInfo(variable)
-
-        aux = {}
+        properties = {}
         for property in variable["rules"]["properties"]:
-            aux[property["name"]] = Variable(property).fabrica()
+            properties[property["name"]] = Variable(property).factory()
 
-        variable["rules"]["properties"] = aux
+        variable["rules"]["properties"] = properties
 
         return variable
 
@@ -24,25 +25,19 @@ class Object(Complex):
     @property
     def jsonSchema(self) -> dict[str, Any]:
 
-        schema = {"type" : "object",
-                  "additionalProperties": False}
+        schema = super().jsonSchema
 
-        for rule, value in self.jsonDumpFormat["rules"].items():
+        schema["type"] = "object"
+        schema["additionalProperties"] = False
 
-            if rule in ["required"]: continue
+        required = []
+        for property in self.properties.values():
 
-            if rule == "properties":
+            schema["properties"][property.name] = property.jsonSchema
 
-                aux = {}
-                for property in self.properties.values():
-                    aux[property.name] = property.jsonSchema
+            if property.jsonSchema["required"]: required.append(property.name)
 
-                schema[rule] = aux
-                continue
-
-            schema[rule] = value
-
-        schema["required"] = [property.name for property in self.properties.values() if property.jsonDumpFormat["rules"]["required"]]
+        schema["required"] = required
 
         return schema
 

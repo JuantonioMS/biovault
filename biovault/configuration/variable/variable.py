@@ -11,16 +11,16 @@ class Variable:
 
     def __init__(self,
                  variable: dict[str : Any],
-                 widespread: dict[str : Any] = None) -> None:
+                 widespread: dict[str : Any] = {}) -> None:
 
         self._variable = self._completeVariableInfo(variable,
-                                                    widespread if not widespread is None else {})
+                                                    widespread)
 
 
 
     def _completeVariableInfo(self,
                               variable: dict[str : Any],
-                              widespread: dict[str : Any]) -> dict:
+                              widespread: dict[str : Any]) -> dict[str : Any]:
 
         """
         Complete the variable info with the widespread info.

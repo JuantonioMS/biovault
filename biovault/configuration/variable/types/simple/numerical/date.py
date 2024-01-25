@@ -8,20 +8,25 @@ from biovault.configuration.variable.types.simple.numerical import Numerical
 class Date(Numerical):
 
 
-    def _completeVariableInfo(self, variable: dict) -> dict:
+    @property
+    def jsonSchema(self) -> dict[str : Any]:
 
-        variable = super()._completeVariableInfo(variable)
+        schema = super().jsonSchema
+        schema["type"] = "date"
 
-        variable["rules"]["type"] = "date"
-        variable["rules"]["format"] = "date"
+        return schema
+
+
+
+    def _completeVariableInfo(self,
+                              variable: dict[str : Any],
+                              widespread: dict[str : Any]) -> dict[str : Any]:
+
+        variable = super()._completeVariableInfo(variable, widespread)
 
         for edge in ["dateMinimum", "dateMaximum"]:
-
             if edge in variable["rules"]:
-                if isinstance(variable["rules"][edge], str):
-                    variable["rules"][edge] = date.fromisoformat(variable["rules"][edge])
-                elif isinstance(variable["rules"][edge], pd._libs.tslibs.timestamps.Timestamp):
-                    variable["rules"][edge] = variable["rules"][edge].to_pydatetime().date()
+                variable["rules"][edge] = self.transformValueToPython(variable["rules"][edge])
 
         return variable
 

@@ -4,14 +4,13 @@ from biovault.configuration.variable.types.simple.numerical import Numerical
 
 class Integer(Numerical):
 
+    @property
+    def jsonSchema(self) -> dict[str : Any]:
 
-    def _completeVariableInfo(self, variable: dict) -> dict:
+        schema = super().jsonSchema
+        schema["type"] = "integer"
 
-        variable = super()._completeVariableInfo(variable)
-
-        variable["rules"]["type"] = "integer"
-
-        return variable
+        return schema
 
 
 

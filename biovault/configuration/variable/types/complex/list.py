@@ -6,13 +6,14 @@ class List(Complex):
 
 
     def _completeVariableInfo(self,
-                              variable: dict) -> dict:
+                              variable: dict[str : Any],
+                              widespread: dict[str : Any]) -> dict[str : Any]:
+
+        variable = super()._completeVariableInfo(variable, widespread)
 
         from biovault.configuration.variable import Variable
 
-        variable = super()._completeVariableInfo(variable)
-
-        variable["rules"]["items"] = Variable(variable["rules"]["items"]).fabrica()
+        variable["rules"]["items"] = Variable(variable["rules"]["items"]).factory()
 
         return variable
 
@@ -21,18 +22,11 @@ class List(Complex):
     @property
     def jsonSchema(self) -> dict[str : Any]:
 
-        schema = {"type" : "array"}
-        for rule, value in self.jsonDumpFormat["rules"].items():
+        schema = super().jsonSchema
 
-            if rule in ["required"]: continue
+        schema["type"] = "array"
 
-            if rule == "items":
-
-
-                schema[rule] = self._variable["rules"]["items"].jsonSchema
-                continue
-
-            schema[rule] = value
+        schema["items"] = self.items.jsonSchema
 
         return schema
 

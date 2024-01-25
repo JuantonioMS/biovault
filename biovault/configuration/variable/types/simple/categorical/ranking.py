@@ -4,12 +4,20 @@ from biovault.configuration.variable.types.simple.categorical.ordinal import Ord
 
 class Ranking(Ordinal):
 
+    @property
+    def jsonSchema(self) -> dict[str : Any]:
 
-    def _completeVariableInfo(self, variable: dict) -> dict:
+            schema = super().jsonSchema
+            schema["type"] = "integer"
 
-        variable = super()._completeVariableInfo(variable)
+            return schema
 
-        variable["rules"]["type"] = "number"
+
+    def _completeVariableInfo(self,
+                              variable: dict[str : Any],
+                              widespread: dict[str : Any]) -> dict[str : Any]:
+
+        variable = super()._completeVariableInfo(variable, widespread)
 
         if "enum" in variable["rules"]:
             minimum, maximum = variable["rules"]["enum"].split(":")
