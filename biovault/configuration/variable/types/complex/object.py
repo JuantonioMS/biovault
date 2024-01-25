@@ -35,7 +35,9 @@ class Object(Complex):
 
             schema["properties"][property.name] = property.jsonSchema
 
-            if property.jsonSchema["required"]: required.append(property.name)
+            try:
+                if property.jsonSchema["required"]: required.append(property.name)
+            except KeyError: pass
 
         schema["required"] = required
 

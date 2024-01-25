@@ -155,8 +155,11 @@ class Configuration:
 
             schema["properties"][variable.name] = variable.jsonSchema
 
-            if variable._variable["rules"]["required"]:
-                schema["required"].append(variable.name)
+            try:
+                if variable._variable["rules"]["required"]:
+                    schema["required"].append(variable.name)
+
+            except KeyError: pass
 
         return schema
 
