@@ -1,12 +1,14 @@
 from typing import Any, Iterator
-from datetime import date
 import pandas as pd
 
 from biovault.configuration import Configuration
 from biovault.validator import BioVaultValidator
+from biovault.utils import Control, Rule
 
 class Register:
 
+
+    #%%  INITIALIZATION METHODS_________________________________________________________________________________________
 
     def __init__(self,
                  data: dict[str : Any],
@@ -18,63 +20,27 @@ class Register:
 
 
 
-    def check(self,
-              configuration: Configuration = None) -> dict[str : list[dict[str : Any]]]:
+    #%%  READ METHODS___________________________________________________________________________________________________
 
-        if configuration is None: configuration = self._configuration
+    def _readData(self,
+                  data: dict[str : Any]) -> dict[str : Any]:
 
-        return {"rule": self.checkRules(configuration),
-                "control": self.checkControls(configuration)}
+        if not "ID" in data: raise NameError("There is no ID field in data")
 
+        if isinstance(data["ID"], float): data["ID"] = str(int(data["ID"]))
+        else: data["ID"] = str(data["ID"]).strip(" \n\r\t")
 
-    def checkRules(self,
-                   configuration: Configuration = None) -> list[dict[str : Any]]:
+        checkedData = {"ID" : data["ID"]}
+        for name, value in data.items():
 
-        if configuration is None: configuration = self._configuration
+            if name == "ID" or not name in self._configuration.getVariablesNames(): continue
+            checkedData[name] = self._configuration[name].transformValueToPython(value)
 
-        schema = BioVaultValidator(configuration.jsonSchema)
-
-        errors = sorted(schema.iter_errors(self.jsonDumpFormat),
-                        key = lambda x: x.path)
-
-        aux = []
-        for error in errors:
-
-            name = ".".join(list(map(str,error.path)))
-            if error.validator == "required":
-                if name: name += "." + error.message.split(" ")[0].strip("'")
-                else: name = error.message.split(" ")[0].strip("'")
-
-            instance = error.instance if error.validator != "required" else None
-
-            aux.append({"variable"  : name,
-                        "value"     : instance,
-                        "validator" : error.validator,
-                        "message"   : error.message})
-
-        return aux
+        return checkedData
 
 
 
-    def checkControls(self,
-                      configuration: Configuration = None) -> list[dict[str : Any]]:
-
-        if configuration is None: configuration = self._configuration
-
-        aux = []
-        for variable in configuration:
-            for control in variable.controls:
-                result = evalSentence(control["control"], self = self)
-
-                if not result is None and not result:
-
-                    aux.append({"variable"  : variable.name,
-                                "value"     : variable.transformValueToJson(self[variable.name]),
-                                "validator" : control["control"],
-                                "message"   : control["message"] if "message" in control else ""})
-
-        return aux
-
+    #%%  FORMULA METHODS________________________________________________________________________________________________
 
     def _executeFormulas(self) -> None:
 
@@ -96,21 +62,80 @@ class Register:
 
 
 
-    def _readData(self,
-                  data: dict[str : Any]) -> dict[str : Any]:
+    #%%  CHECK METHODS__________________________________________________________________________________________________
 
-        if not "ID" in data: raise NameError("There is no ID field in data")
+    def checkRules(self,
+                   configuration: Configuration = None) -> pd.DataFrame:
 
-        if isinstance(data["ID"], float): data["ID"] = str(int(data["ID"]))
-        else: data["ID"] = str(data["ID"]).strip(" \n\r\t")
+        schema = BioVaultValidator(configuration.jsonSchema)
 
-        checkedData = {"ID" : data["ID"]}
-        for name, value in data.items():
+        errors = sorted(schema.iter_errors(self.jsonFormat),
+                        key = lambda x: x.path)
 
-            if name == "ID" or not name in self._configuration.getVariablesNames(): continue
-            checkedData[name] = self._configuration[name].transformValueToPython(value)
+        aux = []
+        for error in errors:
 
-        return checkedData
+            name = ".".join(list(map(str,error.path)))
+            if error.validator == "required":
+                if name: name += "." + error.message.split(" ")[0].strip("'")
+                else: name = error.message.split(" ")[0].strip("'")
+
+            instance = error.instance if error.validator != "required" else None
+
+            aux.append(Rule(self.id,
+                            name,
+                            instance,
+                            error.validator,
+                            error.message))
+
+        return pd.DataFrame(aux)
+
+
+
+    def checkControls(self,
+                      configuration: Configuration = None) -> pd.DataFrame:
+
+        aux = []
+        for variable in configuration:
+            for control in variable.controls:
+                result = variable._evalSentence(control["control"], register = self)
+
+                if not result is None and not result:
+
+                    aux.append(Control(self.id,
+                                      variable.name,
+                                      variable.transformValueToJson(self[variable.name]),
+                                      control["control"],
+                                      control["message"] if "message" in control else ""))
+
+        return pd.DataFrame(aux)
+
+
+
+    def check(self,
+              configuration: Configuration = None) -> pd.DataFrame:
+
+        if configuration is None: configuration = self._configuration
+
+        rules, controls = self.checkRules(configuration), self.checkControls(configuration)
+
+        return pd.concat([rules, controls], ignore_index = True)
+
+
+
+    #%%  PROPERTIES METHODS_____________________________________________________________________________________________
+
+    @property
+    def jsonFormat(self) -> dict[str, str | bool | int | float | list| dict]:
+
+        aux = {"ID" : self._data["ID"]}
+        for name, value in self._data.items():
+
+            if name == "ID": continue
+
+            aux[name] = self._configuration[name].transformValueToJson(value)
+
+        return aux
 
 
 
@@ -132,6 +157,8 @@ class Register:
         return self._data["ID"]
 
 
+
+    #%%  MAGIC METHODS__________________________________________________________________________________________________
 
     def __add__(self,
                 other: Any) -> Any:
@@ -158,7 +185,7 @@ class Register:
         if index in self._configuration.getVariablesNames():
 
             try: return self._data[index]
-            except KeyError: return None
+            except KeyError: return self._configuration[index].nonDefinedValue
 
         else:
             raise KeyError(f"{index} is not present in this database")
@@ -167,14 +194,3 @@ class Register:
 
     def __iter__(self) -> Iterator:
         return iter(self._data.items())
-
-
-
-def evalSentence(sentence, **kwargs):
-
-    locals().update(kwargs) #  Actualiza las variables locales
-
-    try:
-        return eval(sentence)
-    except (ValueError, TypeError, NameError, KeyError, IndexError):
-        return None

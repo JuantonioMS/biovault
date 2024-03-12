@@ -12,6 +12,8 @@ class Registers:
     Clase de registros que alberga las registros de una base de datos.
     """
 
+    #%%  INITIALIZATION METHODS_________________________________________________________________________________________
+
     def __init__(self, *args, configuration: Configuration = None) -> None:
 
         """
@@ -25,35 +27,11 @@ class Registers:
         self._configuration = configuration
 
         self._registers = self._readFiles(*args)
+        self._bucket = {}
 
 
 
-    def check(self,
-              configuration: Configuration = None) -> dict[str : dict[str : list[dict[str : Any]]]]:
-
-        if configuration is None: configuration = self._configuration
-
-        return {register.id : register.check(configuration) for register in self}
-
-
-
-    def checkRules(self,
-                   configuration: Configuration = None) -> dict[str : list[dict[str : Any]]]:
-
-        if configuration is None: configuration = self._configuration
-
-        return {register.id : register.checkRules(configuration) for register in self}
-
-
-
-    def checkControls(self,
-                      configuration: Configuration = None) -> dict[str : list[dict[str : Any]]]:
-
-        if configuration is None: configuration = self._configuration
-
-        return {register.id : register.checkControls(configuration) for register in self}
-
-
+    #%%  READ METHODS___________________________________________________________________________________________________
 
     def _readFiles(self,
                    *args) -> dict[str : Register]:
@@ -68,7 +46,7 @@ class Registers:
 
 
     def _readFile(self,
-                  file: Path) -> dict[str : dict[str : Any]]:
+                  file: Path) -> dict[str : dict[str : Register]]:
 
         if file.suffix == ".xlsx": return self._readExcel(file)
         elif file.suffix == ".json": return self._readJson(file)
@@ -77,7 +55,7 @@ class Registers:
 
 
     def _readExcel(self,
-                   file: Path) -> dict[str : dict[str : Any]]:
+                   file: Path) -> dict[str : dict[str : Register]]:
 
         registers = {}
         with pd.ExcelFile(file) as file:
@@ -147,8 +125,9 @@ class Registers:
         return registers
 
 
+
     def _readJson(self,
-                  file: Path) -> dict[str : dict[str : Any]]:
+                  file: Path) -> dict[str : dict[str : Register]]:
 
         register = {}
         with open(file, "r") as file:
@@ -160,8 +139,8 @@ class Registers:
 
 
     def _updateRegisters(self,
-                         currentRegisters: dict[str : dict[str : Any]],
-                         updateRegisters: dict[str : dict[str : Any]]) -> dict[str : dict[str : Any]]:
+                         currentRegisters: dict[str : Register],
+                         updateRegisters: dict[str : Register]) -> dict[str : Register]:
 
         for updateRegisterId, updateRegister in updateRegisters.items():
 
@@ -175,10 +154,43 @@ class Registers:
 
 
 
+    #%%  FORMULA METHODS________________________________________________________________________________________________
+
     def _executeFormulas(self) -> None:
         for register in self: register._executeFormulas()
 
 
+
+    #%%  CHECK METHODS__________________________________________________________________________________________________
+
+    def checkControls(self,
+                      configuration: Configuration = None) -> pd.DataFrame:
+
+        return pd.concat([register.checkControls(configuration) for register in self],
+                         ignore_index = True)
+
+
+
+    def checkRules(self,
+                   configuration: Configuration = None) -> pd.DataFrame:
+
+        return pd.concat([register.checkRules(configuration) for register in self],
+                         ignore_index = True)
+
+
+
+    def check(self,
+              configuration: Configuration = None) -> pd.DataFrame:
+
+        if configuration is None: configuration = self._configuration
+
+        return pd.concat([self.checkControls(configuration),
+                          self.checkRules(configuration)],
+                         ignore_index = True)
+
+
+
+    #%%  MAGIC METHODS__________________________________________________________________________________________________
 
     def __getitem__(self,
                     value: str) -> Register:
@@ -188,3 +200,31 @@ class Registers:
 
     def __iter__(self) -> Iterator:
         return iter(self._registers.values())
+
+
+
+    def filter(self,
+               variable: str,
+               sentence: str) -> None:
+
+        registersIDs = list(self._registers.keys())
+
+        for registerID in registersIDs:
+
+            register = self._registers[registerID]
+
+            if eval(sentence.replace("variable", f"register['{variable}']")):
+                self._bucket[registerID] = self._registers[registerID]
+                del self._registers[registerID]
+
+
+
+    def __len__(self) -> int:
+        return len(self._registers)
+
+
+
+    def restore(self) -> None:
+
+        self._registers.update(self._bucket)
+        self._bucket = {}

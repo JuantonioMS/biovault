@@ -1,4 +1,7 @@
+from copy import deepcopy
+import pandas as pd
 from typing import Any, Union, TypeVar
+
 Register = TypeVar("Register")
 
 DEFAULT_TYPE = "string"
@@ -96,6 +99,11 @@ class Variable:
     #%%  GENERAL PROPERTIES METHODS_____________________________________________________________________________________
 
     @property
+    def nonDefinedValue(self) -> None:
+        return None
+
+
+    @property
     def name(self) -> str:
         return self._variable["name"]
 
@@ -149,7 +157,7 @@ class Variable:
 
     @property
     def controls(self) -> list[dict]:
-        return self._variable["rules"]
+        return self._variable["controls"]
 
 
 
@@ -180,7 +188,7 @@ class Variable:
     def jsonSchema(self) -> dict:
 
         schema = {}
-        for rule, value in self.jsonDumpFormat["rules"].items():
+        for rule, value in self._variable["rules"].items():
 
             if rule in ["required"]: continue
 
@@ -241,3 +249,11 @@ class Variable:
 
         try: return eval(sentence)
         except (ValueError, TypeError, NameError, KeyError, IndexError): return None
+
+
+
+    def variableToDataframe(self, registers) -> pd.DataFrame:
+
+        return pd.DataFrame(data = [register[self.name] for register in registers],
+                            index = [register.id for register in registers],
+                            columns = [self.name])

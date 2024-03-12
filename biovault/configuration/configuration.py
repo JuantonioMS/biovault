@@ -117,6 +117,7 @@ class Configuration:
 
     #%%  GETTERS METHODS________________________________________________________________________________________________
 
+
     def getVariables(self,
                      **filt) -> dict[str : Variable]:
 
@@ -138,7 +139,6 @@ class Configuration:
     def getVariablesNames(self,
                           **filt) -> list[str]:
         return list(self.getVariables(**filt).keys())
-
 
 
     #%%  JSON METHODS___________________________________________________________________________________________________

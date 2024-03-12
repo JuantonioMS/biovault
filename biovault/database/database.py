@@ -119,67 +119,53 @@ class Database:
         return iter(self._registers)
 
 
-
     def check(self) -> pd.DataFrame:
-
-        dataframe = {"ID"        : [],
-                     "Section"   : [],
-                     "Variable"  : [],
-                     "Value"     : [],
-                     "Validator" : [],
-                     "Message"   : []}
-
-        for id, sections in self._registers.check().items():
-            for section, errors in sections.items():
-                for error in errors:
-                    dataframe["ID"].append(id)
-                    dataframe["Section"].append(section)
-                    dataframe["Variable"].append(error["variable"])
-                    dataframe["Value"].append(error["value"])
-                    dataframe["Validator"].append(error["validator"])
-                    dataframe["Message"].append(error["message"])
-
-        return pd.DataFrame(dataframe)
-
-
+        return self._registers.check(self._configuration)
 
     def checkRules(self) -> pd.DataFrame:
-
-        dataframe = {"ID"        : [],
-                     "Variable"  : [],
-                     "Value"     : [],
-                     "Validator" : [],
-                     "Message"   : []}
-
-        for id, errors in self._registers.checkRules().items():
-            for error in errors:
-                dataframe["ID"].append(id)
-                dataframe["Variable"].append(error["variable"])
-                dataframe["Value"].append(error["value"])
-                dataframe["Validator"].append(error["validator"])
-                dataframe["Message"].append(error["message"])
-
-        return pd.DataFrame(dataframe)
-
-
+        return self._registers.checkRules(self._configuration)
 
     def checkControls(self) -> pd.DataFrame:
+        return self._registers.checkControls(self._configuration)
 
-        dataframe = {"ID"        : [],
-                     "Variable"  : [],
-                     "Value"     : [],
-                     "Validator" : [],
-                     "Message"   : []}
 
-        for id, errors in self._registers.checkControls().items():
-            for error in errors:
-                dataframe["ID"].append(id)
-                dataframe["Variable"].append(error["variable"])
-                dataframe["Value"].append(error["value"])
-                dataframe["Validator"].append(error["validator"])
-                dataframe["Message"].append(error["message"])
 
-        return pd.DataFrame(dataframe)
+    def toDataframe(self) -> pd.DataFrame:
+
+        from biovault.configuration.variable.types.complex.list import List
+        from biovault.configuration.variable.types.complex.object import Object
+        from biovault.configuration.variable.types.complex.multilabel import Multilabel
+        from biovault.configuration.variable.types.simple.numerical.date import Date
+
+        dataframe = pd.DataFrame(index = [register.id for register in self._registers])
+
+        for variable in self._configuration:
+
+            if isinstance(variable, (List, Object, Date)) and not isinstance(variable, Multilabel): continue
+
+            dataframe = pd.concat([dataframe,
+                                   variable.variableToDataframe(self._registers)],
+                                  axis = "columns",
+                                  join = "inner",
+                                  ignore_index = False,
+                                  verify_integrity = True)
+
+        return dataframe
+
+
+
+    def filter(self,
+               variable: str,
+               sentence: str) -> None:
+
+        self._registers.filter(variable, sentence)
+
+
+
+    def restore(self) -> None:
+
+        self._registers.restore()
+
 
 
     def __del__(self) -> None:

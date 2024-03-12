@@ -20,6 +20,12 @@ class List(Complex):
 
 
     @property
+    def nonDefinedValue(self) -> list:
+        return []
+
+
+
+    @property
     def jsonSchema(self) -> dict[str : Any]:
 
         schema = super().jsonSchema
@@ -48,7 +54,8 @@ class List(Complex):
                 return newValue
 
             else:
-                return [self._variable["rules"]["items"].transformValueToPython(value)]
+                if value is None: return None
+                else: return [self._variable["rules"]["items"].transformValueToPython(value)]
 
         except ValueError: return value
 

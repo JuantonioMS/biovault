@@ -23,9 +23,19 @@ class Object(Complex):
 
 
     @property
+    def nonDefinedValue(self) -> list:
+        return {}
+
+
+
+    @property
     def jsonSchema(self) -> dict[str, Any]:
 
         schema = super().jsonSchema
+
+        if "properties" in schema:
+            del schema["properties"]
+            schema["properties"] = {}
 
         schema["type"] = "object"
         schema["additionalProperties"] = False
@@ -65,7 +75,6 @@ class Object(Complex):
 
     def transformValueToJson(self,
                              value: dict[str, Any] | Any) -> dict[str, Any] | Any:
-
 
         if isinstance(value, dict):
 

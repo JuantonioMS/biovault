@@ -9,5 +9,6 @@
     "height": 165.0,
     "weight": 75.0,
     "body_fat": 0.79,
-    "birth_day": "2050-12-31"
+    "birth_day": "2050-12-31",
+    "death_day": "2029-12-31"
 }

@@ -9,7 +9,7 @@
         },
         "controls": [
             {
-                "control": "self['birth_day'] <= self['death_day']",
+                "control": "register['birth_day'] <= register['death_day']",
                 "message": "Birth comes after death"
             }
         ]
@@ -24,7 +24,7 @@
         },
         "controls": [
             {
-                "control": "self['birth_day'] <= self['death_day']",
+                "control": "register['birth_day'] <= register['death_day']",
                 "message": "Death comes before birth"
             }
         ]

@@ -1,3 +1,4 @@
+import pandas as pd
 from typing import Any, Union
 
 from biovault.configuration.variable.types.simple.categorical.ordinal import Ordinal
@@ -34,3 +35,11 @@ class Ranking(Ordinal):
 
         try: return int(value)
         except ValueError: return super().transformValueToPython(value)
+
+
+
+    def variableToDataframe(self, registers) -> pd.DataFrame:
+
+        return pd.DataFrame(data = [register[self.name] for register in registers],
+                            index = [register.id for register in registers],
+                            columns = [self.name])

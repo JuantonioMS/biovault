@@ -12,6 +12,11 @@ class Date(Numerical):
     def jsonSchema(self) -> dict[str : Any]:
 
         schema = super().jsonSchema
+
+        for edge in ["dateMinimum", "dateMaximum"]:
+            if edge in schema:
+                schema[edge] = self.transformValueToJson(schema[edge])
+
         schema["type"] = "date"
 
         return schema
