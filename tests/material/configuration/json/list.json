@@ -2,12 +2,26 @@
     {
         "name": "computers",
         "type": "list",
+
+        "info": {
+            "description": "Listado de ordenadores"
+        },
+
         "rules": {
-            "items": {
+
+            "items":
+            {
                 "name": "computer",
                 "type": "object",
+
+                "info": {
+                    "description": "Características del ordenador"
+                },
+
                 "rules": {
-                    "properties": [
+
+                    "properties":
+                    [
                         {
                             "name": "cpu",
                             "type": "binomial",
@@ -41,20 +55,13 @@
                             "rules": {
                                 "required": true
                             },
-                            "info": {
-                                "formula": "True if own['gpu'] == 'intel' else False"
-                            }
+                            "formula": "True if own['gpu'] == 'intel' else False"
                         }
 
-                    ],
-                    "info": {
-                        "description": "Características del ordenador"
-                    }
+                    ]
+
                 }
             }
-        },
-        "info": {
-            "description": "Listado de ordenadores"
         }
     }
 ]

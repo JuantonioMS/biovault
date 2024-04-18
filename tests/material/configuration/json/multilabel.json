@@ -1,0 +1,16 @@
+[
+
+    {
+        "name": "cities",
+        "type": "multilabel",
+
+        "rules": {
+            "items":
+            {
+                "name": "citie",
+                "type": "nominal"
+            }
+        }
+    }
+
+]

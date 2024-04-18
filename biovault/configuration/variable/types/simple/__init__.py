@@ -1,1 +1,0 @@
-from biovault.configuration.variable.types.simple.simple import Simple

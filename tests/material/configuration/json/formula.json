@@ -1,23 +1,46 @@
 [
+
     {
 		"name": "imc",
 		"type": "float",
+
+		"info": {
+			"description": "Índice de masa corporal"
+		},
+
 		"rules": {
 			"minimum": 0.0,
 			"maximum": 40.0
         },
-		"info": {
-			"description": "Índice de masa corporal",
-            "formula": "round(register['weight'] / pow(register['height'] / 100, 2), 2)"
-		}
+
+		"formula": "round(register['weight'] / pow(register['height'] / 100, 2), 2)"
+
     },
 
 	{
 		"name": "postal_code",
 	 	"type": "string",
-		"info": {
+
+		"formula": {
 			"imports" : ["from scripts.functions import formatPostalCode"],
-			"formula": "formatPostalCode(register)"
+			"sentence": "formatPostalCode(register)"
 		}
+	},
+
+	{
+		"name": "registers_imc_mean",
+		"type": "float",
+
+		"formula": {
+			"imports" : ["from biovault.operation import calculateMean"],
+			"sentence":  "calculateMean(database.getValues('height'))"
+		}
+	},
+
+	{
+		"name": "prueba",
+		"type": "integer",
+		"formula": "len(register['cities'])"
 	}
+
 ]

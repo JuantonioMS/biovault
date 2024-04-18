@@ -1,32 +1,39 @@
 [
+
     {
         "name": "birth_day",
         "type": "date",
+
         "rules": {
             "required": true,
             "dateMinimum": "1995-01-01",
             "dateMaximum": "2023-12-31"
         },
+
         "controls": [
             {
-                "control": "register['birth_day'] <= register['death_day']",
+                "sentence": "register['birth_day'] <= register['death_day']",
                 "message": "Birth comes after death"
             }
         ]
     },
+
     {
         "name": "death_day",
         "type": "date",
+
         "rules": {
             "required": true,
             "dateMinimum": "1900-01-01",
             "dateMaximum": "2100-12-31"
         },
+
         "controls": [
             {
-                "control": "register['birth_day'] <= register['death_day']",
+                "sentence": "register['birth_day'] <= register['death_day']",
                 "message": "Death comes before birth"
             }
         ]
     }
+
 ]

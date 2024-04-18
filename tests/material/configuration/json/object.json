@@ -2,8 +2,11 @@
     {
         "name": "car",
         "type": "object",
-        "rules": {
-            "properties": [
+
+        "rules":
+        {
+            "properties":
+            [
                 {
                     "name": "brand",
                     "type": "nominal",
@@ -59,9 +62,8 @@
                     "rules": {
                         "required": true
                     },
-                    "info": {
-                        "formula": "not own['is_from_japan']"
-                    }
+                    "formula": "not own['is_from_japan']"
+
                 },
 
                 {
@@ -70,16 +72,14 @@
                     "rules": {
                         "required": true
                     },
-                    "info": {
-                        "formula": "True if own['brand'] in ['nissan', 'toyota'] else False"
-                    }
+                    "formula": "True if own['brand'] in ['nissan', 'toyota'] else False"
+
                 }
             ],
             "required": true
         },
         "info": {
             "description": "Coche en propiedad"
-        },
-        "controls": []
+        }
     }
 ]

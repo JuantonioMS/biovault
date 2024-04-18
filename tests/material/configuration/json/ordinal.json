@@ -8,27 +8,22 @@
 				"something",
 				"too much",
 				"all the time"
-			],
-			"required": false,
-			"type": "string"
+			]
 		},
 		"info": {
 			"description": "Consideraci\u00f3n de cuanto fuma"
-		},
-		"controls": []
+		}
 	},
 	{
 		"name": "math_score",
 		"type": "ranking",
 		"rules": {
 			"required": true,
-			"type": "number",
 			"minimum": 1,
 			"maximum": 10
 		},
 		"info": {
-			"description": "\u00daltima clasificaci\u00f3n en matem\u00e1ticas"
-		},
-		"controls": []
+			"description": "Última clasificación en matemáticas"
+		}
 	}
 ]
