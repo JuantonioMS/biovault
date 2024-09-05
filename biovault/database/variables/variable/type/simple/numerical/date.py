@@ -1,26 +1,15 @@
-from copy import deepcopy
 from datetime import date, datetime
 import pandas as pd
 from typing import Any, Union
 
 from biovault.database.variables.variable.type.simple.numerical import Numerical
 
+
 class Date(Numerical):
 
 
-    @property
-    def jsonSchema(self) -> dict[str, Any]:
-
-        schema = super().jsonSchema
-
-        schema["type"] = "date"
-
-        return schema
-
-
-
     @classmethod
-    def transformValueToPython(cls, value: Any) -> Union[date, Any]:
+    def valueToPython(cls, value: Any) -> date:
 
         try:
             if isinstance(value, str): return date.fromisoformat(value)
@@ -28,11 +17,12 @@ class Date(Numerical):
             elif isinstance(value, datetime): return value.date()
             else: return value
 
-        except ValueError: return super().transformValueToPython(value)
+        except ValueError: return super().valueToPython(value)
+
 
 
     @classmethod
-    def transformValueToJson(cls, value: Any) -> str:
+    def valueToJson(cls, value: Any) -> str:
 
         if isinstance(value, date): return value.isoformat()
-        else: return super().transformValueToJson(value)
+        else: return super().valueToJson(value)

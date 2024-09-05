@@ -1,27 +1,15 @@
-from typing import Any
-
 from biovault.database.variables.variable.type.simple import Simple
 
 
 class Numerical(Simple):
 
-
     @property
-    def jsonSchema(self) -> dict[str, Any]:
+    def jsonSchema(self) -> dict:
 
         schema = super().jsonSchema
-
-        schema["type"] = "number"
-
+        schema["type"] = self.type if self.type not in ["float", "percentage"] else "number"
         return schema
 
-
-
-    @classmethod
-    def transformValueToPython(cls, value: Any) -> float:
-
-        try: return float(value)
-        except (ValueError, TypeError): return super().transformValueToPython(value)
 
 
 from biovault.database.variables.variable.type.simple.numerical.float import Float

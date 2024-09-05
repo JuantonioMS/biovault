@@ -1,5 +1,7 @@
-from copy import deepcopy
+import pandas as pd
 from typing import Any
+
+from pandas.core.api import DataFrame as DataFrame
 
 from biovault.database.variables.variable.type.complex import Complex
 from biovault.configuration.constants import DEFAULT_VALUE_OBJECT
@@ -7,30 +9,34 @@ from biovault.configuration.constants import DEFAULT_VALUE_OBJECT
 
 class Object(Complex):
 
+
     DEFAULT_VALUE = DEFAULT_VALUE_OBJECT
 
 
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region JSON schema
+
+
     @property
-    def jsonSchema(self) -> dict[str, Any]:
+    def jsonSchema(self) -> dict:
 
         schema = super().jsonSchema
-
         schema["type"] = "object"
-
         return schema
 
 
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Converters
 
 
-    def transformValueToPython(self,
-                               value: dict[str, Any] | Any) -> dict[str, Any] | Any:
+    def valueToPython(self, value: Any) -> dict:
 
         try:
             if isinstance(value, dict):
 
                 newValue = {}
                 for name, value in value.items():
-                    newValue[name] = self.rules.properties[name].transformValueToPython(value)
+                    newValue[name] = self.rules.properties[name].valueToPython(value)
 
                 return newValue
 
@@ -40,25 +46,25 @@ class Object(Complex):
 
 
 
-    def transformValueToJson(self,
-                             value: dict[str, Any] | Any) -> dict[str, Any] | Any:
+    def valueToJson(self, value: Any) -> dict:
 
         if isinstance(value, dict):
 
             newValue = {}
             for name, value in value.items():
-                newValue[name] = self.rules.properties[name].transformValueToJson(value)
+                newValue[name] = self.rules.properties[name].valueToJson(value)
 
             return newValue
 
-        else: return super().transformValueToJson(value)
+        else: return super().valueToJson(value)
 
 
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Formula
 
 
     def isNestedFormula(self) -> bool:
-        return any([element.isFormula() for element in self.rules.properties.values()])
-
+        return any([property.isFormula() for property in self.rules.properties.values()])
 
 
 
@@ -75,28 +81,25 @@ class Object(Complex):
                 if property.name in content and \
                    property.isAlreadyCalculated(content[property.name]):
 
-                       values[property.name] = property.transformValueToPython(content[property.name])
+                       values[property.name] = property.valueToPython(content[property.name])
 
                 else:
                     if not property.isFormula(): continue
 
+                    argContent = content[property.name] if property.name in content else property.DEFAULT_VALUE,
+
                     if property.type in ["object", "list"] and property.isNestedFormula():
-
-                        value = property._applyFormula(content[property.name] \
-                                                       if property.name in content \
-                                                       else property.DEFAULT_VALUE,
-                                                       **kwargs | {"own" : content[property.name] \
-                                                                           if property.name in content \
-                                                                           else property.DEFAULT_VALUE})
-
+                        argKwargs = kwargs | {"own" : content[property.name] \
+                                              if property.name in content \
+                                              else property.DEFAULT_VALUE}
                     else:
+                        argKwargs = kwargs
 
-                        value = property._applyFormula(content[property.name] \
-                                                       if property.name in content \
-                                                       else property.DEFAULT_VALUE,
-                                                       **kwargs)
+                    value = property._applyFormula(argContent, **argKwargs)
 
-                    values[property.name] = property.transformValueToPython(value)
+                    values[property.name] = property.valueToPython(value)
+
+                content.update(values)
 
             return values
 
@@ -116,3 +119,27 @@ class Object(Complex):
                 if property.isAlreadyCalculated(content[property.name]) == False: return False
 
         return True
+
+
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Dataframe
+
+
+    def toDataframe(self, registers) -> DataFrame:
+
+        data = []
+        for register in registers:
+
+            row = []
+            for property in self.rules.properties.values():
+
+                try: value = register[self.name][property.name]
+                except KeyError: value = property.DEFAULT_VALUE
+
+                row.append(value)
+
+            data.append(row)
+
+        return pd.DataFrame(data = data,
+                            index = [register.id for register in registers],
+                            columns = [property for property in self.rules.properties])

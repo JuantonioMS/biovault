@@ -1,3 +1,4 @@
+import pandas as pd
 from typing import Any
 
 from biovault.database.variables.variable.type.complex import Complex
@@ -75,7 +76,7 @@ class List(Complex):
             values = []
             for element in content:
 
-                values.append(self.rules.items._applyFormula(element, **kwargs | {"own" : element}))
+                values.append(self.rules.items._applyFormula(element, **(kwargs | {"own" : element})))
 
             return values
 
@@ -95,3 +96,45 @@ class List(Complex):
                     return False
 
         return True
+
+
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Dataframe
+
+
+    def toDataframe(self, registers) -> pd.DataFrame:
+
+        ids, data = [], []
+        for register in registers:
+            for item in register[self.name]:
+                ids.append(register.id)
+
+                row = []
+                if self.rules.items.type == "object":
+                    for property in self.rules.items.rules.properties.values():
+
+                        try: value = item[property.name]
+                        except KeyError: value = property.DEFAULT_VALUE
+
+                        if property.type == "multilabel":
+                            value = ";".join(value)
+
+                        row.append(value)
+
+                    data.append(row)
+
+                else:
+                    data.append(item)
+
+
+        if self.rules.items.type == "object":
+
+            return pd.DataFrame(data = data,
+                                index = ids,
+                                columns = [property for property in self.rules.items.rules.properties])
+
+        else:
+
+                return pd.DataFrame(data = data,
+                                    index = ids,
+                                    columns = self.rules.items.name)

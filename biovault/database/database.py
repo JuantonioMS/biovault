@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from pathlib import Path
 from typing import Iterator
 
@@ -7,6 +8,8 @@ from biovault.database.variables import Variables
 from biovault.database.registers import Registers
 
 from biovault.configuration.constants import SCRIPTS_FOLDER_NAME, VARIALBES_FOLDER_NAME, REGISTERS_FOLDER_NAME
+
+
 class Database:
 
 
@@ -29,7 +32,9 @@ class Database:
             for register in self.iterRegisters():
                 register.applyFormulas(databaseLevel = True)
 
-#%%  READ METHODS_______________________________________________________________________________________________________
+
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Read files
 
 
     def _readScripts(self, scripts: Path) -> Scripts:
@@ -38,11 +43,15 @@ class Database:
 
         return Scripts(scripts)
 
+
+
     def _readVariables(self, variables: Path) -> Variables:
 
         if not variables: return None
 
         return Variables(*self._splitInputs(variables))
+
+
 
     def _readRegisters(self, registers: Path) -> Registers:
 
@@ -52,8 +61,12 @@ class Database:
                          variables = self._variables)
 
 
+
     @staticmethod
     def _splitInputs(inputs: Path) -> list[Path]:
+
+        if not isinstance(inputs, Path):
+            return inputs
 
         if not inputs.is_dir(): return [inputs]
         else: return [Path(val) for sublist in [[os.path.join(i[0], j) \
@@ -62,7 +75,8 @@ class Database:
                                 for val in sublist]
 
 
-#%%  SOLVE FORMULAS METHODS_____________________________________________________________________________________________
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Keep and drop
 
 
     def _filter(self, variable: str, sentence: str, recalculateFormulas: bool, sense: str) -> None:
@@ -79,23 +93,143 @@ class Database:
         return newDatabase
 
 
+
     def drop(self, variable: str, sentence: str, recalculateFormulas = True) -> None:
         return self._filter(variable, sentence, recalculateFormulas, "drop")
+
+
 
     def keep(self, variable: str, sentence: str, recalculateFormulas = True) -> None:
         return self._filter(variable, sentence, recalculateFormulas, "keep")
 
-    @property
-    def _configuration(self):
-        return self._variables
+
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Iterators
+
 
     def iterConfiguration(self) -> Iterator:
         return iter(self._variables)
+
+
 
     def iterRegisters(self) -> Iterator:
         return iter(self._registers)
 
 
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Properties
+
+
+    @property
+    def _configuration(self):
+        return self._variables
+
+
+
+    @property
+    def nRegisters(self) -> int:
+        return len(self._registers)
+
+
+
+    @property
+    def nVariables(self) -> int:
+        return len(self._variables)
+
+
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Dataframe
+
+    def toXlsx(self, *args, name = "database.xlsx") -> None:
+
+        if not args:
+            args = self._variables.getVariablesNames()
+
+        generalDataframe, auxDataframes = None, {}
+        for arg in args:
+
+            variable = self._variables[arg]
+
+            if variable.type in ["object", "list"]:
+                auxDataframes[variable.name] = variable.toDataframe(self._registers)
+
+            else:
+                dataframe = variable.toDataframe(self._registers)
+
+                if generalDataframe is None:
+                    generalDataframe = dataframe
+
+                else:
+                    generalDataframe = pd.concat([generalDataframe,
+                                                  dataframe],
+                                                 axis = "columns",
+                                                 join = "inner",
+                                                 ignore_index = False,
+                                                 verify_integrity = True)
+
+        with pd.ExcelWriter(name) as writer:
+
+            generalDataframe.to_excel(writer, sheet_name = "general")
+
+            for key, value in auxDataframes.items():
+                value.to_excel(writer, sheet_name = key)
+
+
+
+    def toDataframe(self, *args) -> pd.DataFrame:
+
+        dataframe = None
+
+        if not args:
+            args = self._variables.getVariablesNames()
+
+        for arg in args:
+
+            variable = self._variables[arg]
+
+            variableDataframe = variable.toDataframe(self._registers)
+
+            dataframe = pd.concat([dataframe,
+                                   variableDataframe],
+                                  axis = "columns",
+                                  join = "inner",
+                                  ignore_index = False,
+                                  verify_integrity = True)
+
+        return dataframe
+
+
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Magic methods
+
 
     def __len__(self) -> int:
         return len(self._registers)
+
+
+
+
+    def __iter__(self) -> Iterator:
+        return self.iterRegisters()
+
+
+
+
+    def __str__(self) -> str:
+        msg = ["Database.",
+               f"\t Registers: {self.nRegisters}",
+               f"\t Variables: {self.nVariables}"]
+
+        return "\n".join(msg)
+
+
+
+
+    def __repr__(self) -> str:
+        return str(self)
+
+
+
+
+    def getVariable(self, variable: str):
+        return self._variables[variable]

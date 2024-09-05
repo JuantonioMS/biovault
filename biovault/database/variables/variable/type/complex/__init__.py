@@ -8,6 +8,7 @@ class Complex(Type):
         return (super().isFormula() or self.isNestedFormula())
 
 
+
 from biovault.database.variables.variable.type.complex.list import List
 from biovault.database.variables.variable.type.complex.object import Object
 from biovault.database.variables.variable.type.complex.multilabel import Multilabel

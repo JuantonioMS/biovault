@@ -18,12 +18,37 @@ class Registers:
                  variables: Variables = None) -> None:
 
         self._variables = variables
-        self._registers = self._readFiles(*files)
-        [register.applyFormulas(databaseLevel = False) for register in self]
 
-        self._variables.addAutomaticVariables()
-        [register.applyFormulas(databaseLevel = False) for register in self]
+        if dict in {type(element) for element in files}:
+            self._registers = self._readDictionary(files)
 
+        else:
+
+            self._registers = self._readFiles(*files)
+            [register.applyFormulas(databaseLevel = False) for register in self]
+
+            self._variables.addAutomaticVariables()
+            [register.applyFormulas(databaseLevel = False) for register in self]
+
+
+
+
+    def _readDictionary(self,
+                        files: dict) -> dict[str : Register]:
+
+        registers = {}
+
+        for index, element in enumerate(files):
+
+            element["ID"] = str(index)
+
+            register = Register(element,
+                                variables = self._variables,
+                                registers = self)
+
+            registers[register.id] = register
+
+        return registers
 
 
 
@@ -37,6 +62,7 @@ class Registers:
                                               self._readFile(file))
 
         return registers
+
 
 
 
@@ -139,6 +165,7 @@ class Registers:
 
         register = Register(data, variables = self._variables, registers = self)
         return {register.id : register}
+
 
 
 

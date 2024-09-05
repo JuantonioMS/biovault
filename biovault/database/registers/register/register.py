@@ -43,7 +43,8 @@ class Register:
                 elif variable.formula.level == "own" and not variable.isAlreadyCalculated(self[variable.name]):
                     value = self._applyFormulaOwn(variable)
 
-                else: continue
+                else:
+                    value = self._applyFormulaRegister(variable)
 
                 if value != self[variable.name]:
 
@@ -95,7 +96,7 @@ class Register:
         for name, value in data.items():
 
             if name == "ID" or not name in self._variables.getVariablesNames(): continue
-            checkedData[name] = self._variables[name].transformValueToPython(value)
+            checkedData[name] = self._variables[name].valueToPython(value)
 
         return checkedData
 
@@ -117,7 +118,7 @@ class Register:
 
             if name == "ID": continue
 
-            aux[name] = self._variables[name].transformValueToJson(value)
+            aux[name] = self._variables[name].valueToJson(value)
 
         return aux
 
@@ -160,7 +161,7 @@ class Register:
         self._clean()
 
         if index in self._variables.getVariablesNames():
-            self._data[index] = self._variables[index].transformValueToPython(value)
+            self._data[index] = self._variables[index].valueToPython(value)
         else:
             raise KeyError(f"{index} is not present in this database")
 

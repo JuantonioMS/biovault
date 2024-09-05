@@ -2,9 +2,9 @@ import numpy as np
 import portion as P
 
 
-
 def cleanNumericalValues(values: list) -> list:
     return [value for value in values if isinstance(value, (int, float))]
+
 
 
 
@@ -30,6 +30,7 @@ def categorizeCuantile(values : list = [],
 
         if value in interval:
             return f"{tag}_{index}to{index + 1}"
+
 
 
 

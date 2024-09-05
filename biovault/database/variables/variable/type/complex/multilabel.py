@@ -7,7 +7,7 @@ from biovault.database.variables.variable.type.complex import List
 class Multilabel(List):
 
 
-    def variableToDataframe(self, registers) -> pd.DataFrame:
+    def toDataframe(self, registers) -> pd.DataFrame:
 
         columns = list({value \
                         for register in registers \
@@ -22,22 +22,22 @@ class Multilabel(List):
             for value in register[self.name]:
                 row[columns.index(value)] = True
 
-            data.append(row)
+            data.append([";".join(sorted(register[self.name]))] + row)
             index.append(register.id)
 
         return pd.DataFrame(data = data,
                             index = index,
-                            columns = [f"{self.name}.{column}" for column in columns])
+                            columns = [self.name] + [f"{self.name}.{column}" for column in columns])
 
 
 
 
-    def transformValueToPython(self, value: Any) -> list:
+    def valueToPython(self, value: Any) -> list:
 
         try:
             if isinstance(value, str):
-                return [self.rules.items.transformValueToPython(element) for element in value.split(";")]
+                return [self.rules.items.valueToPython(element) for element in value.split(";")]
             else:
                 return [str(element) for element in value]
 
-        except ValueError: return super().transformValueToPython(value)
+        except ValueError: return super().valueToPython(value)

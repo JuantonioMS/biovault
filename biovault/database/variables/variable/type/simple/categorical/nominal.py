@@ -6,25 +6,28 @@ from biovault.database.variables.variable.type.simple.categorical import Categor
 class Nominal(Categorical):
 
 
-    def variableToDataframe(self, registers) -> pd.DataFrame:
+    def toDataframe(self, registers) -> pd.DataFrame:
 
-        columns = list({register[self.name] for register in registers if not register[self.name] is None})
-        columns.sort()
+        classes = list({register[self.name] \
+                        for register in registers \
+                        if register[self.name] is not None})
+        classes.sort()
 
-        data, index = [], []
+        index, data = [], []
         for register in registers:
 
-            row = [False] * len(columns)
+            value = register[self.name]
 
-            if not register[self.name] is None:
-                row[columns.index(register[self.name])] = True
+            if value is not None: row = [True if value == clas else False for clas in classes]
+            else: row = [None] * len(classes)
 
-            else:
-                row = [None] * len(columns)
+            index.append(register.id); data.append(row)
 
-            data.append(row)
-            index.append(register.id)
-
-        return pd.DataFrame(data = data,
-                            index = index,
-                            columns = [f"{self.name}.{column}" for column in columns])
+        return pd.concat([super().toDataframe(registers),
+                          pd.DataFrame(data = data,
+                                       index = index,
+                                       columns = [f"{self.name}.{clas}" for clas in classes])],
+                         axis = "columns",
+                         join = "inner",
+                         ignore_index = False,
+                         verify_integrity = True)

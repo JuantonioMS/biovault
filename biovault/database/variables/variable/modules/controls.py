@@ -1,14 +1,15 @@
+from collections import UserList
 from dataclasses import dataclass, field
 
 
-class Controls(list):
+class Controls(UserList):
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, *controls) -> None:
+        super().__init__()
 
-        for index in range(len(self)):
-            content = self.__getitem__(index)
-            self.__setitem__(index, Control(**content))
+        for control in controls:
+            self.append(Control(**control))
+
 
 
 

@@ -2,27 +2,28 @@ from typing import Any
 
 from biovault.database.variables.variable.type.simple import Simple
 
+
 class Categorical(Simple):
 
 
     @property
-    def jsonSchema(self) -> dict[str : Any]:
+    def jsonSchema(self) -> dict:
 
         schema = super().jsonSchema
-
         schema["type"] = "string"
-
         return schema
 
 
+
     @classmethod
-    def transformValueToPython(cls, value: Any) -> str:
+    def valueToPython(cls, value: Any) -> str:
 
         try:
             if value is None: return None
             return str(value).strip(" \n\t\r_-,./;+*")
 
-        except ValueError: return super().transformValueToPython(value)
+        except ValueError: return super().valueToPython(value)
+
 
 
 

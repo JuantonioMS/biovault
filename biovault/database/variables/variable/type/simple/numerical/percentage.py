@@ -1,5 +1,3 @@
-from typing import Any
-
 from biovault.database.variables.variable.type.simple.numerical import Float
 
 

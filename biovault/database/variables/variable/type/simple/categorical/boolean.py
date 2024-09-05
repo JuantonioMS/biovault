@@ -7,23 +7,22 @@ class Boolean(Binomial):
 
 
     @property
-    def jsonSchema(self) -> dict[str : Any]:
+    def jsonSchema(self) -> dict:
 
-            schema = super().jsonSchema
-
-            schema["type"] = "boolean"
-
-            return schema
+        schema = super().jsonSchema
+        schema["type"] = "boolean"
+        return schema
 
 
 
-    def transformValueToPython(self, value: Any) -> bool:
+    @classmethod
+    def valueToPython(cls, value: Any) -> bool:
 
         try:
 
             if isinstance(value, bool): return value
 
-            elif isinstance(value, (int, float)): return bool(value)
+            elif isinstance(value, (int, float)) and value in [0, 1]: return bool(value)
 
             elif isinstance(value, str):
 
@@ -33,4 +32,4 @@ class Boolean(Binomial):
 
             else: return value
 
-        except ValueError: return value
+        except ValueError: return super().valueToPython(value)

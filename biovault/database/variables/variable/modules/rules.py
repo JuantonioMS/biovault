@@ -1,13 +1,15 @@
-from typing import Any
+from collections import UserDict
+from typing import Any, ItemsView
 
 from biovault.configuration.constants import RULES_DEFAULT_REQUIRED
 
-class Rules(dict):
+
+class Rules(UserDict):
 
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, dict = None) -> None:
 
-        super().__init__(*args, **kwargs)
+        super().__init__(dict)
 
         self._checkRequired()
         self._checkEnum()
@@ -16,6 +18,9 @@ class Rules(dict):
         self._checkItems()
         self._checkProperties()
 
+
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Checkers
 
 
     def _checkRequired(self) -> None:
@@ -38,7 +43,7 @@ class Rules(dict):
 
         for keyword in ["dateMinimum", "dateMaximum"]:
             if keyword in self:
-                self[keyword] = Date.transformValueToPython(self[keyword])
+                self[keyword] = Date.valueToPython(self[keyword])
 
 
 
@@ -68,15 +73,36 @@ class Rules(dict):
             self["additionalProperties"] = False
 
 
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region Properties
 
+
+    @property
+    def properties(self) -> dict:
+        return self["properties"]
+
+
+
+    @property
+    def items(self) -> dict:
+        return self["items"]
+
+
+
+    @property
+    def required(self) -> bool:
+        return self["required"]
+
+
+#%%|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#region JSON schema
 
 
     @property
     def jsonSchema(self) -> dict[str, Any]:
 
         schema = {}
-        for keyword in self:
-            value = self[keyword]
+        for keyword, value in self.data.items():
 
             if keyword == "required": continue
 
@@ -85,7 +111,7 @@ class Rules(dict):
 
                 from biovault.database.variables.variable.type.simple.numerical import Date
 
-                schema[keyword] = Date.transformValueToJson(value)
+                schema[keyword] = Date.valueToJson(value)
 
 
             elif keyword == "items":
@@ -107,10 +133,3 @@ class Rules(dict):
             else: schema[keyword] = value
 
         return schema
-
-
-
-    def __getattribute__(self, name: str) -> Any:
-
-        if name in self: return self[name]
-        else: return super().__getattribute__(name)
